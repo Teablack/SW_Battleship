@@ -6,7 +6,7 @@ int read_sign(){
   return sign;
 }
 
-int read_col_or_row(){
+int read_col_or_row(){ 
 	bool is_good=false;
   	int n;
 	while(!is_good){
@@ -14,7 +14,7 @@ int read_col_or_row(){
   		while(!(Serial.available()>0)){}
   		n=read_sign();
       	if(n>9||n<0) {
-     		Serial.print("błędne dane!");	//!przerobic na czytaj z klawiatury!	
+     		Serial.print("błędne dane! Wpisz jeszcze raz\n");	//!przerobic na czytaj z klawiatury!	
      		is_good=false;
         }
     }
@@ -52,12 +52,10 @@ void read_1ship_pos(){	//czytam pojedynczy statek
   	int row,column;
   	
       	Serial.print("wpisz wiersz\n");
-  		while(!(Serial.available()>0)){}
-  		row=read_sign();
+  		row=read_col_or_row();
    
       	Serial.print("wpisz kolumne\n");
-  		while(!(Serial.available()>0)){}
-      	column=read_sign();
+      	column=read_col_or_row();
     
     is_goodpos=check_pos(row,column); 
   	if(is_goodpos){
