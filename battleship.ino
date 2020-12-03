@@ -183,14 +183,14 @@ bool check_pos_for3_2(int row, int col, int old_row1,int old_col1){ //czy moge w
                 int left=col,
                     right=old_col1;
                 if(col>old_col1) swap(left,right);
-                if(check_pos(row,left-1,old_row1,old_col1) || check_pos(row,right+1,old_row1,old_col1))
+                if(left &&(check_pos(row,left-1,old_row1,old_col1)) || (right!=9 && check_pos(row,right+1,old_row1,old_col1 )))
                 return true;
             }
             else{
                 int top=row,
                     bottom=old_row1   ;
                 if(row>old_row1) swap(top,bottom);
-                if(check_pos(top-1,col,old_row1,old_col1) || check_pos(bottom+1,col,old_row1,old_col1))
+                if((top &&check_pos(top-1,col,old_row1,old_col1) )|| (bottom!=9 && check_pos(bottom+1,col,old_row1,old_col1)))
                 return true;
             }
         }
