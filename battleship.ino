@@ -48,12 +48,11 @@ bool check_pos(int row,int column){
 	return true;	
 }
 void read_1ship_pos(){	//czytam pojedynczy statek
-  	bool is_goodpos=true;
+  	bool is_goodpos=false;
   	int row,column;
-  	
+  	while(!is_goodpos){
       	Serial.print("wpisz wiersz\n");
   		row=read_col_or_row();
-   
       	Serial.print("wpisz kolumne\n");
       	column=read_col_or_row();
     
@@ -62,6 +61,7 @@ void read_1ship_pos(){	//czytam pojedynczy statek
     	field[row][column]=1;
     }
   	else Serial.print("błędny krok!\n");
+    }
 }
 
 void read_ships(int count){
