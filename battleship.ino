@@ -54,18 +54,7 @@ bool is_neighbor(int row, int column, int old_row, int old_column)
     return false;
 }
 
-bool check_pos_for_2(int row, int column)
-{
-    if (row && check_pos(row - 1, column, 11, 11))
-        return true;
-    if (row != 9 && check_pos(row + 1, column, 11, 11))
-        return true;
-    if (column && check_pos(row, column - 1, 11, 11))
-        return true;
-    if (column != 9 && check_pos(row, column + 1, 11, 11))
-        return true;
-    return false;
-}
+
 
 bool check_pos(int row, int column, int old_row, int old_column)
 {
@@ -92,6 +81,16 @@ bool check_pos(int row, int column, int old_row, int old_column)
         }
     }
     return true;
+}
+bool check_pos_for_2(int row, int column)
+{
+    if(check_pos(row,col,11,11)){
+        if (row && check_pos(row - 1, column, 11, 11)) return true;
+        if (row != 9 && check_pos(row + 1, column, 11, 11))return true;
+        if (column && check_pos(row, column - 1, 11, 11))return true;
+        if (column != 9 && check_pos(row, column + 1, 11, 11))return true;
+    }
+    return false;
 }
 void read_1ship_pos()
 { //czytam pojedynczy statek
@@ -125,7 +124,7 @@ void read_2ship_pos() //nadal dziala zle
         Serial.print("wpisz kolumne\n");
         column = read_col_or_row();
 
-        is_goodpos = check_pos(row, column, 11, 11);
+        //is_goodpos = check_pos(row, column, 11, 11);
         //teraz sprawdz czy jest miejsce dla 2 klocka
         if (is_goodpos)
         {
