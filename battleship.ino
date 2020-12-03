@@ -84,7 +84,7 @@ bool check_pos(int row, int column, int old_row, int old_column)
 }
 bool check_pos_for_2(int row, int column)
 {
-    if(check_pos(row,col,11,11)){
+    if(check_pos(row,column,11,11)){
         if (row && check_pos(row - 1, column, 11, 11)) return true;
         if (row != 9 && check_pos(row + 1, column, 11, 11))return true;
         if (column && check_pos(row, column - 1, 11, 11))return true;
@@ -166,12 +166,12 @@ void read_2ship_pos() //nadal dziala zle
 
 bool check_pos_for3(int row, int column){   //sprawdza czy dla danego pola mozna dostawic jeszcze dwa klocki
     if(check_pos(row,column,11,11)){
-        if(check_pos(row,column-1,11,11) && check_pos(row,column-2,11,11)) return true;
-        if(check_pos(row,column+1,11,11) && check_pos(row,column+2,11,11)) return true;
-        if(check_pos(row-1,column,11,11) && check_pos(row-2,column,11,11)) return true;
-        if(check_pos(row+1,column,11,11) && check_pos(row+2,column,11,11)) return true;
-        if(check_pos(row-1,column,11,11) && check_pos(row+1,column,11,11)) return true;
-        if(check_pos(row,column+1,11,11) && check_pos(row,column-1,11,11)) return true;
+        if(column>=2 && check_pos(row,column-1,11,11) && check_pos(row,column-2,11,11)) return true;
+        if(column<=7 && check_pos(row,column+1,11,11) && check_pos(row,column+2,11,11)) return true;
+        if(row>=2 && check_pos(row-1,column,11,11) && check_pos(row-2,column,11,11)) return true;
+        if(row<=7 && check_pos(row+1,column,11,11) && check_pos(row+2,column,11,11)) return true;
+        if(row>=1 && row>=8 && check_pos(row-1,column,11,11) && check_pos(row+1,column,11,11)) return true;
+        if(column>=1 && column>=8 && check_pos(row,column+1,11,11) && check_pos(row,column-1,11,11)) return true;
     }
     return false;
 }
