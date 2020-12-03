@@ -72,9 +72,9 @@ bool check_pos(int row, int column, int old_row, int old_column)
     else if (row == 9)
         bottom = column;
 
-    for (int i = left; i <= right; i++)
+    for (int i = top; i <= bottom; i++)
     {
-        for (int j = top; j <= bottom; j++)
+        for (int j = left; j <= right; j++)
         {
             if (field[i][j] && i != old_row && j != old_column)
                 return false;
