@@ -1,17 +1,17 @@
 int ship_count[] = {4, 3, 2, 1}; //1os-4 2os-3 3os-2 4os-1
 int field[10][10];
 
-//dopisac is_exists zeby nie wstawiac to samo pole
 int read_sign()
 {
     int sign = Serial.parseInt();
     return sign;
 }
 
-void swap(int &a, int &b) {
-   int t = a;
-   a = b;
-   b = t;
+void swap(int &a, int &b)
+{
+    int t = a;
+    a = b;
+    b = t;
 }
 
 int read_col_or_row()
@@ -54,8 +54,6 @@ bool is_neighbor(int row, int column, int old_row, int old_column)
     return false;
 }
 
-
-
 bool check_pos(int row, int column, int old_row, int old_column)
 {
     int left = column - 1,
@@ -84,11 +82,16 @@ bool check_pos(int row, int column, int old_row, int old_column)
 }
 bool check_pos_for_2(int row, int column)
 {
-    if(check_pos(row,column,11,11)){
-        if (row && check_pos(row - 1, column, 11, 11)) return true;
-        if (row != 9 && check_pos(row + 1, column, 11, 11))return true;
-        if (column && check_pos(row, column - 1, 11, 11))return true;
-        if (column != 9 && check_pos(row, column + 1, 11, 11))return true;
+    if (check_pos(row, column, 11, 11))
+    {
+        if (row && check_pos(row - 1, column, 11, 11))
+            return true;
+        if (row != 9 && check_pos(row + 1, column, 11, 11))
+            return true;
+        if (column && check_pos(row, column - 1, 11, 11))
+            return true;
+        if (column != 9 && check_pos(row, column + 1, 11, 11))
+            return true;
     }
     return false;
 }
@@ -123,23 +126,18 @@ void read_2ship_pos() //nadal dziala zle
         row = read_col_or_row();
         Serial.print("wpisz kolumne\n");
         column = read_col_or_row();
-
-        //is_goodpos = check_pos(row, column, 11, 11);
-        //teraz sprawdz czy jest miejsce dla 2 klocka
+        is_goodpos = check_pos_for_2(row, column);
         if (is_goodpos)
         {
-            is_goodpos = check_pos_for_2(row, column);
-            if (is_goodpos)
-            {
-                field[row][column] = 1;
-            }
+            field[row][column] = 1;
         }
+        
         else
             Serial.print("błędny krok!Wpisz jeszcze raz\n");
     }
     int old_row = row, old_column = column;
     Serial.print("wpisz drugi klocek\n");
-    //wstawic drugi po sasiedstwu i sprawdzic jak 1
+    show_field();
     is_goodpos = false;
     while (!is_goodpos)
     {
@@ -164,49 +162,69 @@ void read_2ship_pos() //nadal dziala zle
     }
 }
 
-bool check_pos_for3(int row, int column){   //sprawdza czy dla danego pola mozna dostawic jeszcze dwa klocki
-    if(check_pos(row,column,11,11)){
-        if(column>=2 && check_pos(row,column-1,11,11) && check_pos(row,column-2,11,11)) return true;
-        if(column<=7 && check_pos(row,column+1,11,11) && check_pos(row,column+2,11,11)) return true;
-        if(row>=2 && check_pos(row-1,column,11,11) && check_pos(row-2,column,11,11)) return true;
-        if(row<=7 && check_pos(row+1,column,11,11) && check_pos(row+2,column,11,11)) return true;
-        if(row>=1 && row>=8 && check_pos(row-1,column,11,11) && check_pos(row+1,column,11,11)) return true;
-        if(column>=1 && column>=8 && check_pos(row,column+1,11,11) && check_pos(row,column-1,11,11)) return true;
+bool check_pos_for3(int row, int column)
+{ //sprawdza czy dla danego pola mozna dostawic jeszcze dwa klocki
+    if (check_pos(row, column, 11, 11))
+    {
+        if (column >= 2 && check_pos(row, column - 1, 11, 11) && check_pos(row, column - 2, 11, 11))
+            return true;
+        if (column <= 7 && check_pos(row, column + 1, 11, 11) && check_pos(row, column + 2, 11, 11))
+            return true;
+        if (row >= 2 && check_pos(row - 1, column, 11, 11) && check_pos(row - 2, column, 11, 11))
+            return true;
+        if (row <= 7 && check_pos(row + 1, column, 11, 11) && check_pos(row + 2, column, 11, 11))
+            return true;
+        if (row >= 1 && row >= 8 && check_pos(row - 1, column, 11, 11) && check_pos(row + 1, column, 11, 11))
+            return true;
+        if (column >= 1 && column >= 8 && check_pos(row, column + 1, 11, 11) && check_pos(row, column - 1, 11, 11))
+            return true;
     }
     return false;
 }
 
-bool check_pos_for3_2(int row, int col, int old_row1,int old_col1){ //czy moge wstawić 2 klocek do statku z 3 kloc
-    if(is_neighbor(row,col,old_row1,old_col1)){
-        if(check_pos(row,col,old_row1,old_col1)){
-            if(row==old_row1){
-                int left=col,
-                    right=old_col1;
-                if(col>old_col1) swap(left,right);
-                if(left &&(check_pos(row,left-1,old_row1,old_col1)) || (right!=9 && check_pos(row,right+1,old_row1,old_col1 )))
-                return true;
+bool check_pos_for3_2(int row, int col, int old_row1, int old_col1)
+{ //czy moge wstawić 2 klocek do statku z 3 kloc
+    if (is_neighbor(row, col, old_row1, old_col1))
+    {
+        if (check_pos(row, col, old_row1, old_col1))
+        {
+            if (row == old_row1)
+            {
+                int left = col,
+                    right = old_col1;
+                if (col > old_col1)
+                    swap(left, right);
+                if (left && (check_pos(row, left - 1, old_row1, old_col1)) || (right != 9 && check_pos(row, right + 1, old_row1, old_col1)))
+                    return true;
             }
-            else{
-                int top=row,
-                    bottom=old_row1   ;
-                if(row>old_row1) swap(top,bottom);
-                if((top &&check_pos(top-1,col,old_row1,old_col1) )|| (bottom!=9 && check_pos(bottom+1,col,old_row1,old_col1)))
-                return true;
+            else
+            {
+                int top = row,
+                    bottom = old_row1;
+                if (row > old_row1)
+                    swap(top, bottom);
+                if ((top && check_pos(top - 1, col, old_row1, old_col1)) || (bottom != 9 && check_pos(bottom + 1, col, old_row1, old_col1)))
+                    return true;
             }
         }
     }
-return false;
+    return false;
 }
 
-bool check_pos_for3_3(int row, int col, int old_row1,int old_col1,int old_row2,int old_col2){
-    if((row==old_row1==old_row2) || (col==old_col1==old_col2) ) {
-        if(is_neighbor(row,col,old_row1,old_col1) && check_pos(row,col,old_row1,old_col1)) return true;
-        if(is_neighbor(row,col,old_row2,old_col2) && check_pos(row,col,old_row2,old_col2)) return true;
+bool check_pos_for3_3(int row, int col, int old_row1, int old_col1, int old_row2, int old_col2)
+{
+    if ((row == old_row1 == old_row2) || (col == old_col1 == old_col2))
+    {
+        if (is_neighbor(row, col, old_row1, old_col1) && check_pos(row, col, old_row1, old_col1))
+            return true;
+        if (is_neighbor(row, col, old_row2, old_col2) && check_pos(row, col, old_row2, old_col2))
+            return true;
     }
     return false;
 }
 
-void read_3ship_pos(){ //dopisac sprawdzenia na granice
+void read_3ship_pos()
+{ //dopisac sprawdzenia na granice
     bool is_goodpos = false;
     int row, column;
     while (!is_goodpos)
@@ -224,7 +242,7 @@ void read_3ship_pos(){ //dopisac sprawdzenia na granice
         else
             Serial.print("błędny krok!Wpisz jeszcze raz\n");
     }
-    int old_row1=row,old_col1=column;
+    int old_row1 = row, old_col1 = column;
     Serial.print("wpisz 2 klocek\n");
     is_goodpos = false;
     while (!is_goodpos)
@@ -234,7 +252,7 @@ void read_3ship_pos(){ //dopisac sprawdzenia na granice
         Serial.print("wpisz kolumne\n");
         column = read_col_or_row();
 
-        is_goodpos = check_pos_for3_2(row, column,old_row1,old_col1);
+        is_goodpos = check_pos_for3_2(row, column, old_row1, old_col1);
         if (is_goodpos)
         {
             field[row][column] = 1;
@@ -242,7 +260,7 @@ void read_3ship_pos(){ //dopisac sprawdzenia na granice
         else
             Serial.print("błędny krok!Wpisz jeszcze raz\n");
     }
-    int old_row2=row,old_col2=column;
+    int old_row2 = row, old_col2 = column;
     Serial.print("wpisz 3 klocek\n");
     is_goodpos = false;
     while (!is_goodpos)
@@ -252,7 +270,7 @@ void read_3ship_pos(){ //dopisac sprawdzenia na granice
         Serial.print("wpisz kolumne\n");
         column = read_col_or_row();
 
-        is_goodpos = check_pos_for3_3(row, column,old_row1,old_col1,old_row2,old_col2);
+        is_goodpos = check_pos_for3_3(row, column, old_row1, old_col1, old_row2, old_col2);
         if (is_goodpos)
         {
             field[row][column] = 1;
@@ -281,11 +299,11 @@ void read_ships(int count)
             read_2ship_pos();
             show_field();
         }
-        break; 
-      case 2:
-      	read_3ship_pos();
-      	read_3ship_pos();
-      	break;/*
+        break;
+    case 2:
+        read_3ship_pos();
+        read_3ship_pos();
+        break; /*
       case 1:
       	read_4ship_pos();
       	break; */
@@ -303,8 +321,6 @@ void init_void()
     for (int i = 0; i < 4; i++)
         read_ships(ship_count[i]);
 }
-
-
 
 void setup()
 {
