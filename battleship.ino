@@ -98,7 +98,9 @@ void read_2ship_pos(){
   		else Serial.print("błędny krok!Wpisz jeszcze raz\n");
     }
   		int old_row=row,old_column=column;
+  Serial.print("wpisz drugi klocek\n");
   //wstawic drugi po sasiedstwu i sprawdzic jak 1
+  		is_goodpos=false;
     	while(!is_goodpos){
       		Serial.print("wpisz wiersz\n");
   			row=read_col_or_row();
@@ -106,10 +108,13 @@ void read_2ship_pos(){
       		column=read_col_or_row();
           	//sprawdz czy sasiaduja
           	is_goodpos= is_neighbor(row,column,old_row,old_column);
-    		is_goodpos= is_goodpos &&(check_pos(row,column,old_row,old_column));
-    		if(is_goodpos){
-    			field[row][column]=1;
-    		}
+          	if(is_goodpos){
+            	is_goodpos=(check_pos(row,column,old_row,old_column));
+    			if(is_goodpos){
+    				field[row][column]=1;
+    			}
+              	else Serial.print("błędny krok!Wpisz jeszcze raz\n");
+            }
   			else Serial.print("błędny krok!Wpisz jeszcze raz\n");
     	}
 }
@@ -129,7 +134,7 @@ void read_ships(int count){
         read_2ship_pos();
       	show_field();
       }
-      break;/*
+        break;/*
       case 2:
       	read_3ship_pos();
       	read_3ship_pos();
@@ -138,6 +143,7 @@ void read_ships(int count){
       	read_4ship_pos();
       	break; */
     }
+  Serial.print("/n Koniec wstawiania");
 }
 
 void init_void(){ 	//procedura init; ustawiam wsz wartosci pola na puste
@@ -150,7 +156,7 @@ void init_void(){ 	//procedura init; ustawiam wsz wartosci pola na puste
 void setup()
 {
   Serial.begin(9600);
-  Serial.print("Start!");
+  Serial.print("Start!\n");
   init_void();
 }
 
