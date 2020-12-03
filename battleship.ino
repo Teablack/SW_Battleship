@@ -1,10 +1,31 @@
 int ship_count[] ={4,3,2,1}; //1os-4 2os-3 3os-2 4os-1
 int field[10][10];
 
-void show_field(){			//wyświetlam pole gry
+int read_sign(){
+  int sign=Serial.parseInt();
+  return sign;
+}
+
+int read_col_or_row(){
+	bool is_good=false;
+  	int n;
+	while(!is_good){
+		is_good=true;
+  		while(!(Serial.available()>0)){}
+  		n=read_sign();
+      	if(n>9||n<0) {
+     		Serial.print("błędne dane!");	//!przerobic na czytaj z klawiatury!	
+     		is_good=false;
+        }
+    }
+return  n;     
+}  
+
+void show_field(){//wyświetlam pole gry
+  	Serial.print("\n");
 	for(int i=0;i<10;i++){	
     	for(int j=0;j<10;j++)Serial.print(field[i][j]);
-    Serial.print("\n");
+    	Serial.print("\n");
   	}
 }
 
@@ -28,18 +49,27 @@ bool check_pos(int row,int column){
 }
 void read_1ship_pos(){	//czytam pojedynczy statek
   	bool is_goodpos=true;
-	int row = Serial.read();	//!przerobic na czytaj z klawiatury!
-  	int column = Serial.read();	//!przerobic na czytaj z klawiatury!
-  	is_goodpos=check_pos(row,column); 
+  	int row,column;
+  	
+      	Serial.print("wpisz wiersz\n");
+  		while(!(Serial.available()>0)){}
+  		row=read_sign();
+   
+      	Serial.print("wpisz kolumne\n");
+  		while(!(Serial.available()>0)){}
+      	column=read_sign();
+    
+    is_goodpos=check_pos(row,column); 
   	if(is_goodpos){
     	field[row][column]=1;
     }
-  	else Serial.print("błędny krok!");
+  	else Serial.print("błędny krok!\n");
 }
 
 void read_ships(int count){
 	switch (count){
       case 4:
+      	Serial.print("Wpisz pozycje statkow1\n");
       	for(int i=0;i<count;i++)read_1ship_pos();
       	show_field();
         break;	/*	
