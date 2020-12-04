@@ -54,7 +54,7 @@ bool is_neighbor(int row, int column, int old_row, int old_column)
     return false;
 }
 
-bool check_pos(int row, int column, int old_row, int old_column)
+bool check_pos(int row, int column, int old_row, int old_column) 
 {
     int left = column - 1,
         right = column + 1,
@@ -66,9 +66,9 @@ bool check_pos(int row, int column, int old_row, int old_column)
     else if (column == 9)
         right = column;
     if (!row)
-        top = column;
+        top = row;
     else if (row == 9)
-        bottom = column;
+        bottom = row;
 
     for (int i = top; i <= bottom; i++)
     {
@@ -84,11 +84,11 @@ bool check_pos_for_2(int row, int column)
 {
     if (check_pos(row, column, 11, 11))
     {
-        if (row && check_pos(row - 1, column, 11, 11))
+        if (row!=0 && check_pos(row - 1, column, 11, 11))
             return true;
         if (row != 9 && check_pos(row + 1, column, 11, 11))
             return true;
-        if (column && check_pos(row, column - 1, 11, 11))
+        if (column!=0 && check_pos(row, column - 1, 11, 11))
             return true;
         if (column != 9 && check_pos(row, column + 1, 11, 11))
             return true;
@@ -116,7 +116,7 @@ void read_1ship_pos()
     }
 }
 
-void read_2ship_pos() //nadal dziala zle
+void read_2ship_pos() 
 {
     bool is_goodpos = false;
     int row, column;
@@ -126,18 +126,21 @@ void read_2ship_pos() //nadal dziala zle
         row = read_col_or_row();
         Serial.print("wpisz kolumne\n");
         column = read_col_or_row();
-        is_goodpos = check_pos_for_2(row, column);
+
+        is_goodpos = check_pos_for_2(row, column); //blednie dziala
         if (is_goodpos)
         {
-            field[row][column] = 1;
+            field[row][column] = 1; break;
         }
         
         else
             Serial.print("błędny krok!Wpisz jeszcze raz\n");
     }
     int old_row = row, old_column = column;
+
     Serial.print("wpisz drugi klocek\n");
     show_field();
+
     is_goodpos = false;
     while (!is_goodpos)
     {
@@ -146,19 +149,16 @@ void read_2ship_pos() //nadal dziala zle
         Serial.print("wpisz kolumne\n");
         column = read_col_or_row();
         //sprawdz czy sasiaduja
-        is_goodpos = is_neighbor(row, column, old_row, old_column);
-        if (is_goodpos)
-        {
-            is_goodpos = (check_pos(row, column, old_row, old_column));
+        
+            is_goodpos = (check_pos(row, column, old_row, old_column))&&is_neighbor(row, column, old_row, old_column);
             if (is_goodpos)
             {
-                field[row][column] = 1;
+                field[row][column] = 1;break;
             }
             else
                 Serial.print("błędny krok!Wpisz jeszcze raz\n");
-        }
-        else
-            Serial.print("błędny krok!Wpisz jeszcze raz\n");
+        
+        Serial.print("błędny krok!Wpisz jeszcze raz\n");
     }
 }
 
@@ -286,7 +286,7 @@ void read_ships(int count)
     {
     case 4:
         Serial.print("Wpisz pozycje statkow1\n");
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < 0; i++)
         {
             read_1ship_pos();
             show_field();
