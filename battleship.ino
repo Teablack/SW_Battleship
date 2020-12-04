@@ -48,8 +48,7 @@ void check_and_insert(bool is_goodpos,int row,int col){
         {
             field[row][col] = 1;
         }
-        else
-            Serial.print("zla pozycja !Wpisz jeszcze raz\n");
+        else Serial.print("zla pozycja !Wpisz jeszcze raz\n");
 }
 
 void show_field()
@@ -120,7 +119,6 @@ void read_1ship_pos()
     while (!is_goodpos)
     {
         insertion_row_col(row,column);
-
         is_goodpos = check_pos(row, column, 11, 11);
         check_and_insert(is_goodpos,row,column);
     }
@@ -133,8 +131,7 @@ void read_2ship_pos()
     while (!is_goodpos)
     {
         insertion_row_col(row,column);
-
-        is_goodpos = check_pos_for_2(row, column); //blednie dziala
+        is_goodpos = check_pos_for_2(row, column); 
         check_and_insert(is_goodpos,row,column);
     }
     int old_row = row, old_column = column;
@@ -146,12 +143,9 @@ void read_2ship_pos()
     while (!is_goodpos)
     {
         insertion_row_col(row,column);
-        //sprawdz czy sasiaduja
-        
-            is_goodpos = (check_pos(row, column, old_row, old_column))&&is_neighbor(row, column, old_row, old_column);
-            check_and_insert(is_goodpos,row,column);
-        
-        
+        is_goodpos=is_neighbor(row, column, old_row, old_column;
+        is_goodpos = is_goodpos &&(check_pos(row, column, old_row, old_column);
+        check_and_insert(is_goodpos,row,column);
     }
 }
 
