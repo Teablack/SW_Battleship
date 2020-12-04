@@ -318,7 +318,7 @@ void read_ships(int count)
         show_field();
         break; 
       case 1: 
-        Serial.print("Wpisz statki podwojne\n");
+        Serial.print("Wpisz statek czwarty\n");
       	read_4ship_pos();
         show_field();
       	break; 
