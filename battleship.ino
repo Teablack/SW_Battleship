@@ -213,7 +213,7 @@ bool check_pos_for3_2(int row, int col, int old_row1, int old_col1)
 
 bool check_pos_for3_3(int row, int col, int old_row1, int old_col1, int old_row2, int old_col2)
 {
-    if ((row == old_row1 == old_row2) || (col == old_col1 == old_col2))
+    if ((row == old_row1 && old_row1 == old_row2) || (col == old_col1 && old_col1 == old_col2))
     {
         if (is_neighbor(row, col, old_row1, old_col1) && check_pos(row, col, old_row1, old_col1))
             return true;
@@ -261,6 +261,7 @@ void read_3ship_pos()
             Serial.print("błędny krok!Wpisz jeszcze raz\n");
     }
     int old_row2 = row, old_col2 = column;
+
     Serial.print("wpisz 3 klocek\n");
     is_goodpos = false;
     while (!is_goodpos)
