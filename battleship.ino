@@ -34,6 +34,24 @@ int read_col_or_row()
     return n;
 }
 
+void insertion_row_col(int &row,int &col){
+
+        Serial.print("wpisz wiersz:\n");
+        row = read_col_or_row();
+        Serial.print("wpisz kolumne:\n");
+        col = read_col_or_row();
+
+}
+
+void check_and_insert(bool is_goodpos,int row,int col){
+    if (is_goodpos)
+        {
+            field[row][col] = 1;
+        }
+        else
+            Serial.print("zla pozycja !Wpisz jeszcze raz\n");
+}
+
 void show_field()
 { //wyświetlam pole gry
     Serial.print("\n");
@@ -96,23 +114,15 @@ bool check_pos_for_2(int row, int column)
     return false;
 }
 void read_1ship_pos()
-{ //czytam pojedynczy statek
+{ //czytam statek pojedynczy 
     bool is_goodpos = false;
     int row, column;
     while (!is_goodpos)
     {
-        Serial.print("wpisz wiersz\n");
-        row = read_col_or_row();
-        Serial.print("wpisz kolumne\n");
-        column = read_col_or_row();
+        insertion_row_col(row,column);
 
         is_goodpos = check_pos(row, column, 11, 11);
-        if (is_goodpos)
-        {
-            field[row][column] = 1;
-        }
-        else
-            Serial.print("błędny krok!Wpisz jeszcze raz\n");
+        check_and_insert(is_goodpos,row,column);
     }
 }
 
@@ -122,19 +132,10 @@ void read_2ship_pos()
     int row, column;
     while (!is_goodpos)
     {
-        Serial.print("wpisz wiersz\n");
-        row = read_col_or_row();
-        Serial.print("wpisz kolumne\n");
-        column = read_col_or_row();
+        insertion_row_col(row,column);
 
         is_goodpos = check_pos_for_2(row, column); //blednie dziala
-        if (is_goodpos)
-        {
-            field[row][column] = 1; break;
-        }
-        
-        else
-            Serial.print("błędny krok!Wpisz jeszcze raz\n");
+        check_and_insert(is_goodpos,row,column);
     }
     int old_row = row, old_column = column;
 
@@ -144,19 +145,11 @@ void read_2ship_pos()
     is_goodpos = false;
     while (!is_goodpos)
     {
-        Serial.print("wpisz wiersz\n");
-        row = read_col_or_row();
-        Serial.print("wpisz kolumne\n");
-        column = read_col_or_row();
+        insertion_row_col(row,column);
         //sprawdz czy sasiaduja
         
             is_goodpos = (check_pos(row, column, old_row, old_column))&&is_neighbor(row, column, old_row, old_column);
-            if (is_goodpos)
-            {
-                field[row][column] = 1;break;
-            }
-            else
-                Serial.print("błędny krok!Wpisz jeszcze raz\n");
+            check_and_insert(is_goodpos,row,column);
         
         Serial.print("błędny krok!Wpisz jeszcze raz\n");
     }
@@ -229,36 +222,20 @@ void read_3ship_pos()
     int row, column;
     while (!is_goodpos)
     {
-        Serial.print("wpisz wiersz\n");
-        row = read_col_or_row();
-        Serial.print("wpisz kolumne\n");
-        column = read_col_or_row();
+        insertion_row_col(row,column);
 
         is_goodpos = check_pos_for3(row, column);
-        if (is_goodpos)
-        {
-            field[row][column] = 1;
-        }
-        else
-            Serial.print("błędny krok!Wpisz jeszcze raz\n");
+        check_and_insert(is_goodpos,row,column);
     }
     int old_row1 = row, old_col1 = column;
     Serial.print("wpisz 2 klocek\n");
     is_goodpos = false;
     while (!is_goodpos)
     {
-        Serial.print("wpisz wiersz\n");
-        row = read_col_or_row();
-        Serial.print("wpisz kolumne\n");
-        column = read_col_or_row();
+        insertion_row_col(row,column);
 
         is_goodpos = check_pos_for3_2(row, column, old_row1, old_col1);
-        if (is_goodpos)
-        {
-            field[row][column] = 1;
-        }
-        else
-            Serial.print("błędny krok!Wpisz jeszcze raz\n");
+        check_and_insert(is_goodpos,row,column);
     }
     int old_row2 = row, old_col2 = column;
 
@@ -266,18 +243,10 @@ void read_3ship_pos()
     is_goodpos = false;
     while (!is_goodpos)
     {
-        Serial.print("wpisz wiersz\n");
-        row = read_col_or_row();
-        Serial.print("wpisz kolumne\n");
-        column = read_col_or_row();
+        insertion_row_col(row,column);
 
         is_goodpos = check_pos_for3_3(row, column, old_row1, old_col1, old_row2, old_col2);
-        if (is_goodpos)
-        {
-            field[row][column] = 1;
-        }
-        else
-            Serial.print("błędny krok!Wpisz jeszcze raz\n");
+        check_and_insert(is_goodpos,row,column);
     }
     Serial.print("statek3 zapisany\n");
 }
@@ -286,7 +255,7 @@ void read_ships(int count)
     switch (count)
     {
     case 4:
-        Serial.print("Wpisz pozycje statkow1\n");
+        Serial.print("Wpisz statki pojedyncze\n");
         for (int i = 0; i < count; i++)
         {
             read_1ship_pos();
@@ -294,7 +263,7 @@ void read_ships(int count)
         }
         break;
     case 3:
-        Serial.print("Wpisz pozycje statkow2\n");
+        Serial.print("Wpisz statki podwojne\n");
         for (int i = 0; i < count; i++)
         {
             read_2ship_pos();
@@ -302,17 +271,19 @@ void read_ships(int count)
         }
         break;
     case 2:
+        Serial.print("Wpisz statki podtrojne\n");
         read_3ship_pos();
         show_field();
         read_3ship_pos();
         show_field();
         break; /*
-      case 1:
+      case 1: 
+        Serial.print("Wpisz statki podwojne\n");
       	read_4ship_pos();
         show_field();
       	break; */
     }
-    Serial.print("/n Koniec wstawiania");
+    Serial.print("/n Koniec wstawiania\n");
 }
 
 void init_void()
