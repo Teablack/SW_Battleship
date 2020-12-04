@@ -151,7 +151,7 @@ void read_2ship_pos()
             is_goodpos = (check_pos(row, column, old_row, old_column))&&is_neighbor(row, column, old_row, old_column);
             check_and_insert(is_goodpos,row,column);
         
-        Serial.print("błędny krok!Wpisz jeszcze raz\n");
+        
     }
 }
 
