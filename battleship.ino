@@ -286,7 +286,7 @@ void read_ships(int count)
     {
     case 4:
         Serial.print("Wpisz pozycje statkow1\n");
-        for (int i = 0; i < 0; i++)
+        for (int i = 0; i < count; i++)
         {
             read_1ship_pos();
             show_field();
@@ -302,10 +302,13 @@ void read_ships(int count)
         break;
     case 2:
         read_3ship_pos();
+        show_field();
         read_3ship_pos();
+        show_field();
         break; /*
       case 1:
       	read_4ship_pos();
+        show_field();
       	break; */
     }
     Serial.print("/n Koniec wstawiania");
