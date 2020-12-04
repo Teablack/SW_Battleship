@@ -217,7 +217,7 @@ bool check_pos_for3_3(int row, int col, int old_row1, int old_col1, int old_row2
 }
 
 void read_3ship_pos()
-{ //dopisac sprawdzenia na granice
+{ 
     bool is_goodpos = false;
     int row, column;
     while (!is_goodpos)
@@ -228,27 +228,67 @@ void read_3ship_pos()
         check_and_insert(is_goodpos,row,column);
     }
     int old_row1 = row, old_col1 = column;
+
+    show_field();
+
     Serial.print("wpisz 2 klocek\n");
     is_goodpos = false;
     while (!is_goodpos)
     {
         insertion_row_col(row,column);
-
         is_goodpos = check_pos_for3_2(row, column, old_row1, old_col1);
         check_and_insert(is_goodpos,row,column);
     }
     int old_row2 = row, old_col2 = column;
-
+    show_field();
     Serial.print("wpisz 3 klocek\n");
     is_goodpos = false;
     while (!is_goodpos)
     {
         insertion_row_col(row,column);
-
         is_goodpos = check_pos_for3_3(row, column, old_row1, old_col1, old_row2, old_col2);
         check_and_insert(is_goodpos,row,column);
     }
     Serial.print("statek3 zapisany\n");
+}
+
+bool check_pos_for4(int row,int col){
+    if (check_pos(row, col, 11, 11))
+    {
+        if(row>=0 && check_pos(row+1,col,11,11)&& check_pos(row+2,col,11,11)&& check_pos(row+3,col,11,11)) return true;
+        if(row<=9 && check_pos(row-1,col,11,11)&& check_pos(row-2,col,11,11)&& check_pos(row-3,col,11,11)) return true;
+        if(row>=1 && check_pos(row-1,col,11,11)&& check_pos(row+1,col,11,11)&& check_pos(row+2,col,11,11)) return true;
+        if(row<=8 && check_pos(row+1,col,11,11)&& check_pos(row-1,col,11,11)&& check_pos(row-2,col,11,11)) return true;
+        if(row>=2 && check_pos(row-1,col,11,11)&& check_pos(row-2,col,11,11)&& check_pos(row+1,col,11,11)) return true;
+        if(row<=7 && check_pos(row+1,col,11,11)&& check_pos(row+2,col,11,11)&& check_pos(row-1,col,11,11)) return true;
+        if(row>=3 && check_pos(row-1,col,11,11)&& check_pos(row-2,col,11,11)&& check_pos(row-3,col,11,11)) return true;
+        if(row<=6 && check_pos(row+1,col,11,11)&& check_pos(row+2,col,11,11)&& check_pos(row+3,col,11,11)) return true;
+
+        if(col>=0 && check_pos(row,col+1,11,11)&& check_pos(row,col+2,11,11)&& check_pos(row,col+3,11,11)) return true;
+        if(col<=9 && check_pos(row,col-1,11,11)&& check_pos(row,col-2,11,11)&& check_pos(row,col-3,11,11)) return true;
+        if(col>=1 && check_pos(row,col-1,11,11)&& check_pos(row,col+1,11,11)&& check_pos(row,col+2,11,11)) return true;
+        if(col<=8 && check_pos(row,col+1,11,11)&& check_pos(row,col-1,11,11)&& check_pos(row,col-2,11,11)) return true;
+        if(col>=2 && check_pos(row,col-1,11,11)&& check_pos(row,col-2,11,11)&& check_pos(row,col+1,11,11)) return true;
+        if(col<=7 && check_pos(row,col+1,11,11)&& check_pos(row,col+2,11,11)&& check_pos(row,col-1,11,11)) return true;
+        if(col>=3 && check_pos(row,col-1,11,11)&& check_pos(row,col-2,11,11)&& check_pos(row,col-3,11,11)) return true;
+        if(col<=6 && check_pos(row,col+1,11,11)&& check_pos(row,col+2,11,11)&& check_pos(row,col+3,11,11)) return true;
+
+    }
+
+    return false;
+}
+
+void read_4ship_pos(){
+    bool is_goodpos = false;
+    int row, column;
+    while (!is_goodpos)
+    {
+        insertion_row_col(row,column);
+        is_goodpos = check_pos_for4(row,column);
+        check_and_insert(is_goodpos,row,column);
+    }
+    int old_row1 = row, old_col1 = column;
+    show_field();
 }
 void read_ships(int count)
 {
@@ -276,12 +316,12 @@ void read_ships(int count)
         show_field();
         read_3ship_pos();
         show_field();
-        break; /*
+        break; 
       case 1: 
         Serial.print("Wpisz statki podwojne\n");
       	read_4ship_pos();
         show_field();
-      	break; */
+      	break; 
     }
     Serial.print("/n Koniec wstawiania\n");
 }
