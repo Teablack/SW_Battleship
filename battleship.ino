@@ -1,6 +1,7 @@
 int ship_count[] = {4, 3, 2, 1}; //1os-4 2os-3 3os-2 4os-1
 int field[10][10];  //moje pole
 int field2[10][10]; //obce pole
+int loose=20,win=0;
 
 //wczytywanie 1 liczbe
 int read_sign(){
