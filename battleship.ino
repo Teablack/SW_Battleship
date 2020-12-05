@@ -277,7 +277,7 @@ bool is_good_forth(int row, int col, int old_row1, int old_col1, int old_row2, i
     return false;
 }
 
-//procedyry do wczytywania roznych typow statkow
+//procedury do wczytywania roznych typow statkow
 
 //statek pojedynczy
 void read_1ship(){
@@ -405,11 +405,12 @@ void read_4ship(){
 }
 //wczytywanie wszystkich statkow
 void read_ships(int count){
+    int i;
     switch (count)
     { 
     case 4:
         Serial.print("Wpisz statki pojedyncze\n");
-        for (int i = 0; i < count; i++)
+        for (i = 0; i < count; i++)
         {
             read_1ship();
             show_field();
@@ -417,7 +418,7 @@ void read_ships(int count){
         break;
     case 3:
         Serial.print("Wpisz statki podwojne\n");
-        for (int i = 0; i < count; i++)
+        for (i = 0; i < count; i++)
         {
             read_2ship();
             show_field();
@@ -479,16 +480,21 @@ bool is_killed(int row,int col){
     }
     return false;
 }
-void init_void(){ 
 
-    for (int i = 0; i < 10; i++)
+void trafiony(int row,int col){
+    //if(is_killed){}     jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
+    //else ;              jesli nie wyslij 2 i ustaw aktualny statek na 2
+}
+void init_void(){ 
+    int i,j;
+    for (i = 0; i < 10; i++)
     {
-        for (int j = 0; j < 10; j++){
+        for (j = 0; j < 10; j++){
             field[i][j] =0; //moje puste
             field2[i][j]=1;//obce nieznane
         }
     }
-    for (int i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++)
         read_ships(ship_count[i]);
 }
 
