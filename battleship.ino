@@ -1,3 +1,4 @@
+int  player =  1;
 int ship_count[] = {4, 3, 2, 1}; //1os-4 2os-3 3os-2 4os-1
 int field[10][10];  //moje pole 
                     //0-pusty 
@@ -9,9 +10,10 @@ int field2[10][10]; //obce pole
                     //1-pole nieznane
                     //2-trafiony
                     //3-zabity
-int loose=20,win=0;
+int lose=20,win=20;
 int data[4];//1- pionowo,col,min_row,max_row
             //0- poziomo,row,min_col,max_col
+
 //wczytywanie 1 liczbe
 int read_sign(){
     int sign = Serial.parseInt();
@@ -77,6 +79,10 @@ void show_field(){
         }
         Serial.print("\n");
     }
+}
+//TUTAJ WYSYLA SIE TO DO INNEGO ARDU ALE JA WYSWIETLAM W KONSOLI HA-HA  
+void send_to_player(int row,int col){
+    Serial.write("wyslano!\n");
 }
 //wyslij 3 do drugiego gracza
 void send_killed(){
@@ -503,7 +509,7 @@ void set_killed(){
         for(i=data[2];i<=data[3];i++) field[i][j];
     }
 }
-
+//zrobic uniwersalne ?
 void trafiony(int row,int col){
     if(is_killed){     //jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
         set_killed();
@@ -515,6 +521,7 @@ void trafiony(int row,int col){
     } ;              
     
 }
+
 void init_void(){ 
     int i,j;
     for (i = 0; i < 10; i++)
@@ -528,10 +535,54 @@ void init_void(){
         read_ships(ship_count[i]);
 }
 
+bool game_over(){
+    if(!lose || !win) return true;
+    else return false;
+}
+
+void get_answer(int &a){
+    //тут  без проверки нужно переписать
+    a=read_col_or_row();
+}
+void sender(){
+    bool is_goodpos = false;
+    int row, col;
+    while (!is_goodpos)
+    {
+        Serial.print("wpisz pole innego gracza");
+        insertion_row_col(row, col); 
+        if(field2[row][col]) { //jesli pole nieznane 
+            send_to_player(row,col);
+            is_goodpos=true;
+        } 
+        int a;
+        get_answer(a);
+        if(!a) field2[row][col]=0;  //pusty
+        else if (a==2)  field2[row][col]=2; //trafiony
+        //else //killed odbior macierzy i wypewnienie przekazywanie field
+
+    }
+}
+void receiver(){}
+
 void setup(){
     Serial.begin(9600);
     Serial.print("Start!\n");
-    init_void();
+    //init_void();
+    while(!game_over){
+        if(player){ //gdy jestes pierwszy
+            sender();
+            receiver();
+        }
+        else {
+            receiver();
+            sender();
+        }
+    }
+    if(!lose) 
+        Serial.print("przegrales");
+    else 
+        Serial.print("wygrales");
 }
 
 void loop(){
