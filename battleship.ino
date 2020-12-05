@@ -97,6 +97,62 @@ bool check_pos(int row, int column, int old_row, int old_column)
     }
     return true;
 }
+
+int top_count(int row, int col, int count)
+{ // Ile(ale <=count) nad tym !pustym! polem można wstawic
+    int top = 0;
+    for (int i = 1; i <= count; i++)
+    {
+        if (((row - i) >= 0) && (check_pos(row - i, col, 11, 11)))
+            top++;
+        else
+            return top;
+    }
+    return top;
+}
+
+// Ile(ale <=count) zlewa od tego !pustego! pola można wstawic
+int left_count(int row, int col, int count)
+{
+    int left = 0;
+    for (int i = 1; i <= count; i++)
+    {
+        if (((col - i) >= 0) && (check_pos(row, col - i, 11, 11)))
+            left++;
+        else
+            return left;
+    }
+    return left;
+}
+
+// Ile(ale <=count ) na dole od tego !pustego! pola można wstawic
+int bottom_count(int row, int col, int count)
+{
+    int bottom = 0;
+    for (int i = 1; i <= count; i++)
+    {
+        if (((row + i) <= 9) && (check_pos(row + i, col, 11, 11)))
+            bottom++;
+        else
+            return bottom;
+    }
+    return bottom;
+}
+
+// Ile sprawa od tego !pustego! pola można wstawic
+int right_count(int row, int col, int count)
+{
+    int right = 0;
+    for (int i = 1; i <= count; i++)
+    {
+        if (((col + i) <= 9) && (check_pos(row, col + i, 11, 11)))
+            right++;
+
+        else
+            return right;
+    }
+    return right;
+}
 bool check_pos_for_2(int row, int column)
 {
     if (check_pos(row, column, 11, 11))
