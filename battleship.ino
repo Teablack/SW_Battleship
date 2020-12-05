@@ -260,18 +260,18 @@ bool is_good_forth(int row, int col, int old_row1, int old_col1, int old_row2, i
     { //czy pionowo
         int top = min(old_row1, min(old_row2, old_row3)),
             bottom = max(old_row1, max(old_row2, old_row3));
-        if ((top_count(top, col, 1, bottom, 11)) && (is_neighbor(row, col, top, col)))
+        if ((top_count(top, col, 1, bottom, col)) && (is_neighbor(row, col, top, col)))
             return true;
-        if ((bottom_count(bottom, col, 1, top, 11)) && (is_neighbor(row, col, bottom, col)))
+        if ((bottom_count(bottom, col, 1, top, col)) && (is_neighbor(row, col, bottom, col)))
             return true;
     }
     else if ((row == old_row1) && (old_row1 == old_row2))
     { //czy poziomo
         int left = min(old_col1, min(old_col2, old_col3)),
             right = max(old_col1, max(old_col2, old_col3));
-        if ((left_count(row, left, 1, right, 11)) && (is_neighbor(row, col, row, left)))
+        if ((left_count(row, left, 1,row,left)) && (is_neighbor(row, col, row, left)))
             return true;
-        if ((right_count(row, right, 1, left, 11)) && (is_neighbor(row, col, row, right)))
+        if ((right_count(row, right, 1, row, right)) && (is_neighbor(row, col, row, right)))
             return true;
     }
     return false;
