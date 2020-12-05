@@ -28,7 +28,7 @@ int read_col_or_row()
         n = read_sign();
         if (n > 9 || n < 0)
         {
-            Serial.print("błędne dane! Wpisz jeszcze raz\n"); //!przerobic na czytaj z klawiatury!
+            Serial.print("bledne dane! Wpisz jeszcze raz\n"); //!przerobic na czytaj z klawiatury!
             is_good = false;
         }
     }
@@ -38,10 +38,13 @@ int read_col_or_row()
 void insertion_row_col(int &row, int &col)
 {
 
-    Serial.print("wpisz wiersz:\n");
+    Serial.print("wpisz wiersz: ");
     row = read_col_or_row();
-    Serial.print("wpisz kolumne:\n");
+    Serial.print(row);
+    Serial.print("\nwpisz kolumne: ");
     col = read_col_or_row();
+    Serial.print(col);
+    Serial.print("\n");
 }
 //wstawianie elementu statku
 void check_and_insert(bool is_goodpos, int row, int col)
@@ -55,7 +58,7 @@ void check_and_insert(bool is_goodpos, int row, int col)
 }
 //wyświetlanie pola gry
 void show_field()
-{ 
+{
     Serial.print("  0 1 2 3 4 5 6 7 8 9 ");
     Serial.print("\n");
     for (int i = 0; i < 10; i++)
@@ -66,7 +69,7 @@ void show_field()
         {
             Serial.print(field[i][j]);
             Serial.print(" ");
-        }    
+        }
         Serial.print("\n");
     }
 }
@@ -95,25 +98,11 @@ bool check_pos(int row, int column, int old_row, int old_column)
         top = row;
     else if (row == 9)
         bottom = row;
-    //test
-    Serial.print(left) ; //0 1 0 2
-    Serial.print(" ") ;
-    Serial.print(right) ;
-    Serial.print(" ") ;
-    Serial.print(top) ; 
-    Serial.print(" ") ;
-    Serial.print(bottom) ;
-    Serial.print(" ") ;
-    Serial.print("\n") ;
 
-    for (int i = top; i <= bottom; i++) //0-2
+    for (int i = top; i <= bottom; i++)
     {
-        for (int j = left; j <= right; j++) //0-1
+        for (int j = left; j <= right; j++)
         {
-
-            Serial.print(i);
-            Serial.print(j);
-            Serial.print(": \n");
 
             if ((i == old_row) && (j == old_column))
             {
@@ -127,12 +116,12 @@ bool check_pos(int row, int column, int old_row, int old_column)
 
 //pamietaj ze wstawiasz NIE STATEK a ilosc klockow ktorych brakuje !
 // Ile(ale <=count) nad tym !pustym! polem można wstawic
-int top_count(int row, int col, int count)
-{ 
+int top_count(int row, int col, int count, int b1, int b2)
+{
     int top = 0;
     for (int i = 1; i <= count; i++)
     {
-        if (((row - i) >= 0) && (check_pos(row - i, col, 11, 11)))
+        if (((row - i) >= 0) && (check_pos(row - i, col, b1, b2)))
             top++;
         else
             return top;
@@ -141,12 +130,12 @@ int top_count(int row, int col, int count)
 }
 
 // Ile(ale <=count) zlewa od tego !pustego! pola można wstawic
-int left_count(int row, int col, int count)
+int left_count(int row, int col, int count, int b1, int b2)
 {
     int left = 0;
     for (int i = 1; i <= count; i++)
     {
-        if (((col - i) >= 0) && (check_pos(row, col - i, 11, 11)))
+        if (((col - i) >= 0) && (check_pos(row, col - i, b1, b2)))
             left++;
         else
             return left;
@@ -155,12 +144,12 @@ int left_count(int row, int col, int count)
 }
 
 // Ile(ale <=count ) na dole od tego !pustego! pola można wstawic
-int bottom_count(int row, int col, int count)
+int bottom_count(int row, int col, int count, int b1, int b2)
 {
     int bottom = 0;
     for (int i = 1; i <= count; i++)
     {
-        if (((row + i) <= 9) && (check_pos(row + i, col, 11, 11)))
+        if (((row + i) <= 9) && (check_pos(row + i, col, b1, b2)))
             bottom++;
         else
             return bottom;
@@ -169,12 +158,12 @@ int bottom_count(int row, int col, int count)
 }
 
 // Ile(ale <=count) z prawa od tego !pustego! pola można wstawic
-int right_count(int row, int col, int count)
+int right_count(int row, int col, int count, int b1, int b2)
 {
     int right = 0;
     for (int i = 1; i <= count; i++)
     {
-        if (((col + i) <= 9) && (check_pos(row, col + i, 11, 11)))
+        if (((col + i) <= 9) && (check_pos(row, col + i, b1, b2)))
             right++;
 
         else
@@ -184,44 +173,42 @@ int right_count(int row, int col, int count)
 }
 
 //czy pierwszy klocek jest dobry dla tego statku i wg czy dobry
-bool is_good_first(int row, int col, int count) 
+bool is_good_first(int row, int col, int count)
 {
     int top = 0, bottom = 0, left = 0, right = 0;
     if (check_pos(row, col, 11, 11))
     {
-        top = top_count(row, col, count);
+        top = top_count(row, col, count, 11, 11);
         if (top == count)
             return true;
-        bottom = bottom_count(row, col, count - top);
+        bottom = bottom_count(row, col, count - top, 11, 11);
         if (top + bottom == count)
             return true;
-        left = left_count(row, col, count);
+        left = left_count(row, col, count, 11, 11);
         if (left == count)
             return true;
-        right = right_count(row, col, count - left);
+        right = right_count(row, col, count - left, 11, 11);
         if (left + right == count)
             return true;
     }
     return false;
 }
 
-//NIE TESTOWANA!!
 //czy drugi klocek jest dobry dla tego statku i wg czy dobry
-bool is_good_second(int row, int col,int old_row,int old_col, int count) 
+bool is_good_second(int row, int col, int old_row, int old_col, int count)
 {
     int top = 0, bottom = 0, left = 0, right = 0;
-    if(check_pos(row,col,old_row,old_col)) Serial.print("uwaza ze jest komorka nie graniczonca z innymi");
-    if ((check_pos(row,col,old_row,old_col))&&(is_neighbor(row,col,old_row,old_col)))  //dodatkowo sprawdzenie na sasiedzi
+    if ((check_pos(row, col, old_row, old_col)) && (is_neighbor(row, col, old_row, old_col))) //dodatkowo sprawdzenie na sasiedzi
     {
         if (col == old_col)
         { //jesli pionowo
             int top_row = min(row, old_row),
                 bottom_row = max(row, old_row);
 
-            top = top_count(top_row, col, count);
+            top = top_count(top_row, col, count, 11, 11);
             if (top == count)
                 return true;
-            bottom = bottom_count(bottom_row, col, count - top);
+            bottom = bottom_count(bottom_row, col, count - top, 11, 11);
             if (top + bottom == count)
                 return true;
         }
@@ -229,10 +216,10 @@ bool is_good_second(int row, int col,int old_row,int old_col, int count)
         {
             int left_col = min(col, old_col),
                 right_col = max(col, old_col);
-            left = left_count(row, left_col, count);
+            left = left_count(row, left_col, count, 11, 11);
             if (left == count)
                 return true;
-            right = right_count(row, right_col, count - left);
+            right = right_count(row, right_col, count - left, 11, 11);
             if (left + right == count)
                 return true;
         }
@@ -241,36 +228,42 @@ bool is_good_second(int row, int col,int old_row,int old_col, int count)
 }
 
 //NIE TESTOWANA!!
-//czy trzeci klocek jest dobry do tego statku i wg dobry
+//czy trzeci klocek jest dobry do tego statku i wg dobry - zle dziala dla 3 klocku w 4os (wstawia tylko po jednej stronie) po lewej ?
 bool is_good_third(int row, int col, int old_row1, int old_col1, int old_row2, int old_col2, int count)
-{ 
+{
 
     int top = 0, bottom = 0, left = 0, right = 0;
+
     if (
+
         (
             (check_pos(row, col, old_row1, old_col1)) && (is_neighbor(row, col, old_row1, old_col1))) ||
         ((is_neighbor(row, col, old_row2, old_col2)) && (check_pos(row, col, old_row2, old_col2))))
     {
-        if ((col == old_col1) == old_col2)
+        if ((col == old_col1) && (old_col1 == old_col2))
         { //jesli pionowo
+
             int top_row = min(row, min(old_row1, old_row2)),
                 bottom_row = max(row, max(old_row1, old_row2));
 
-            top = top_count(top_row, col, count);
+            top = top_count(top_row, col, count, top_row, col); //    bottom_row, col
             if (top == count)
                 return true;
-            bottom = bottom_count(bottom_row, col, count - top);
+            bottom = bottom_count(bottom_row, col, count - top, bottom_row, col); // top_row, col
             if (top + bottom == count)
                 return true;
         }
-        else if ((row == old_row1) == old_row2) //jesli poziomo
+        else if ((row == old_row1) && (old_row1 == old_row2))
         {
+
             int left_col = min(col, min(old_col1, old_col2)),
                 right_col = max(col, max(old_col1, old_col2));
-            left = left_count(row, left_col, count);
+
+            left = left_count(row, left_col, count, row, left_col); //row right_col
             if (left == count)
                 return true;
-            right = right_count(row, right_col, count - left);
+
+            right = right_count(row, right_col, count - left, row, right_col); // row left_col
             if (left + right == count)
                 return true;
         }
@@ -278,18 +271,26 @@ bool is_good_third(int row, int col, int old_row1, int old_col1, int old_row2, i
     return false;
 }
 //NIE TESTOWANA!!
-bool is_good_forth(int row,int col, int old_row1, int old_col1, int old_row2, int old_col2, int old_row3, int old_col3){ //tylko sprawdzic czy wg mozna czy jest sasiad i czy row col row col
-    if ((col==old_col1)==old_col2){//czy pionowo
-        int top=min(old_row1, min(old_row2,old_row3)),
-            bottom=max(old_row1, max(old_row2,old_row3));
-            if((top_count(top,col,1))&& (is_neighbor(row,col,top,col))) return true;
-            if((bottom_count(bottom,col,1))&&(is_neighbor(row,col,bottom,col))) return true;
+//zle dziala - wstawia tylko po jednej stronie
+bool is_good_forth(int row, int col, int old_row1, int old_col1, int old_row2, int old_col2, int old_row3, int old_col3)
+{ //tylko sprawdzic czy wg mozna czy jest sasiad i czy row col row col
+    if ((col == old_col1) && (old_col1 == old_col2))
+    { //czy pionowo
+        int top = min(old_row1, min(old_row2, old_row3)),
+            bottom = max(old_row1, max(old_row2, old_row3));
+        if ((top_count(top, col, 1, bottom, 11)) && (is_neighbor(row, col, top, col)))
+            return true;
+        if ((bottom_count(bottom, col, 1, top, 11)) && (is_neighbor(row, col, bottom, col)))
+            return true;
     }
-    else if((row==old_row1)==old_row2){ //czy poziomo 
-        int left=min(old_col1, min(old_col2,old_col3)),
-            right=max(old_col1, max(old_col2,old_col3));
-            if((left_count(left,col,1)) && (is_neighbor(row,col,row,left))) return true;
-            if((right_count(right,col,1))&& (is_neighbor(row,col,row, right))) return true;
+    else if ((row == old_row1) && (old_row1 == old_row2))
+    { //czy poziomo
+        int left = min(old_col1, min(old_col2, old_col3)),
+            right = max(old_col1, max(old_col2, old_col3));
+        if ((left_count(row, left, 1, right, 11)) && (is_neighbor(row, col, row, left)))
+            return true;
+        if ((right_count(row, right, 1, left, 11)) && (is_neighbor(row, col, row, right)))
+            return true;
     }
     return false;
 }
@@ -298,7 +299,7 @@ bool is_good_forth(int row,int col, int old_row1, int old_col1, int old_row2, in
 
 //statek pojedynczy
 void read_1ship()
-{ 
+{
     bool is_goodpos = false;
     int row, column;
     while (!is_goodpos)
@@ -318,19 +319,19 @@ void read_2ship()
     while (!is_goodpos)
     {
         insertion_row_col(row, column);
-        is_goodpos = is_good_first(row,column,1);
+        is_goodpos = is_good_first(row, column, 1);
         check_and_insert(is_goodpos, row, column);
     }
 
     int old_row = row, old_column = column;
     show_field();
     Serial.print("wpisz drugi klocek\n");
-    
+
     is_goodpos = false;
     while (!is_goodpos)
     {
         insertion_row_col(row, column);
-        is_goodpos = is_good_second(row,column,old_row,old_column,0);
+        is_goodpos = is_good_second(row, column, old_row, old_column, 0);
         check_and_insert(is_goodpos, row, column);
     }
     Serial.print("statek 2 zapisany\n");
@@ -344,7 +345,7 @@ void read_3ship()
     while (!is_goodpos)
     {
         insertion_row_col(row, column);
-        is_goodpos = is_good_first(row, column,2);
+        is_goodpos = is_good_first(row, column, 2);
         check_and_insert(is_goodpos, row, column);
     }
 
@@ -356,19 +357,19 @@ void read_3ship()
     while (!is_goodpos)
     {
         insertion_row_col(row, column);
-        is_goodpos = is_good_second(row,column,old_row1,old_col1,1);
+        is_goodpos = is_good_second(row, column, old_row1, old_col1, 1);
         check_and_insert(is_goodpos, row, column);
     }
 
     int old_row2 = row, old_col2 = column;
     show_field();
-    Serial.print("wpisz 3 klocek\n");
 
+    Serial.print("wpisz 3 klocek\n");
     is_goodpos = false;
     while (!is_goodpos)
     {
         insertion_row_col(row, column);
-        is_goodpos = is_good_third(row, column, old_row1, old_col1, old_row2, old_col2,0);
+        is_goodpos = is_good_third(row, column, old_row1, old_col1, old_row2, old_col2, 0);
         check_and_insert(is_goodpos, row, column);
     }
     Serial.print("statek 3 zapisany\n");
@@ -382,7 +383,7 @@ void read_4ship()
     while (!is_goodpos)
     {
         insertion_row_col(row, column);
-        is_goodpos = is_good_first(row, column,3);
+        is_goodpos = is_good_first(row, column, 3);
         check_and_insert(is_goodpos, row, column);
     }
 
@@ -394,7 +395,7 @@ void read_4ship()
     while (!is_goodpos)
     {
         insertion_row_col(row, column);
-        is_goodpos = is_good_second(row,column,old_row1,old_col1,2);
+        is_goodpos = is_good_second(row, column, old_row1, old_col1, 2);
         check_and_insert(is_goodpos, row, column);
     }
 
@@ -406,7 +407,7 @@ void read_4ship()
     while (!is_goodpos)
     {
         insertion_row_col(row, column);
-        is_goodpos = is_good_third(row, column, old_row1, old_col1, old_row2, old_col2,1);
+        is_goodpos = is_good_third(row, column, old_row1, old_col1, old_row2, old_col2, 1);
         check_and_insert(is_goodpos, row, column);
     }
 
@@ -418,7 +419,7 @@ void read_4ship()
     while (!is_goodpos)
     {
         insertion_row_col(row, column);
-        is_goodpos = is_good_forth(row, column, old_row1, old_col1, old_row2, old_col2,old_row3,old_col3);
+        is_goodpos = is_good_forth(row, column, old_row1, old_col1, old_row2, old_col2, old_row3, old_col3);
         check_and_insert(is_goodpos, row, column);
     }
 
@@ -428,7 +429,7 @@ void read_4ship()
 void read_ships(int count)
 {
     switch (count)
-    {
+    { 
     case 4:
         Serial.print("Wpisz statki pojedyncze\n");
         for (int i = 0; i < count; i++)
@@ -444,14 +445,14 @@ void read_ships(int count)
             read_2ship();
             show_field();
         }
-        break;
+        break; 
     case 2:
         Serial.print("Wpisz statki podtrojne\n");
         read_3ship();
         show_field();
         read_3ship();
         show_field();
-        break;
+        break; 
     case 1:
         Serial.print("Wpisz statek czwarty\n");
         read_4ship();
