@@ -78,6 +78,16 @@ void show_field(){
         Serial.print("\n");
     }
 }
+//wyslij 3 do drugiego gracza
+void send_killed(){
+    Serial.print(3);
+    Serial.print("zabite");
+}
+//wyslij 2 do 2 gracza i data[] 
+void send_hit(){
+    Serial.print(2);
+    Serial.print("trafione");
+}
 //czy sa to sasiednie komorki
 bool is_neighbor(int row, int column, int old_row, int old_column){
     if (row == old_row && ((column - 1 == old_column && column != 0) || (column + 1 == old_column && column != 9)))
@@ -481,9 +491,29 @@ bool is_killed(int row,int col){
     return false;
 }
 
+//ustawia swoje statki na zabite - przerobic na uniwerslne, przekaz tablice
+void set_killed(){
+    int i,j;
+    if(data[0]){
+        j=data[1];
+        for(i=data[2];i<=data[3];i++) field[j][i];
+    }
+    else{
+        j=data[1];
+        for(i=data[2];i<=data[3];i++) field[i][j];
+    }
+}
+
 void trafiony(int row,int col){
-    //if(is_killed){}     jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
-    //else ;              jesli nie wyslij 2 i ustaw aktualny statek na 2
+    if(is_killed){     //jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
+        set_killed();
+        send_killed();
+    }
+    else{               //jesli nie wyslij 2 i ustaw aktualny statek na 2
+        send_hit();
+        field[row][col]=2; //ustaw jako trafiony
+    } ;              
+    
 }
 void init_void(){ 
     int i,j;
