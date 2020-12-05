@@ -153,6 +153,28 @@ int right_count(int row, int col, int count)
     }
     return right;
 }
+
+bool is_good_first(int row, int col, int count) //czy pierwszy klocek jest dobry dla tego statku
+{
+    int top = 0, bottom = 0, left = 0, right = 0;
+    if (check_pos(row, col, 11, 11))
+    {
+        top = top_count(row, col, count);
+        if (top == count)
+            return true;
+        bottom = bottom_count(row, col, count - top);
+        if (top + bottom == count)
+            return true;
+        left = left_count(row, col, count);
+        if (left == count)
+            return true;
+        right = right_count(row, col, count - left);
+        if (left + right == count)
+            return true;
+    }
+    return false;
+}
+
 bool check_pos_for_2(int row, int column)
 {
     if (check_pos(row, column, 11, 11))
