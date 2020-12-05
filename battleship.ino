@@ -56,9 +56,12 @@ void check_and_insert(bool is_goodpos, int row, int col)
 //wyświetlanie pola gry
 void show_field()
 { 
+    Serial.print("  0 1 2 3 4 5 6 7 8 9 ");
     Serial.print("\n");
     for (int i = 0; i < 10; i++)
     {
+        Serial.print(i);
+        Serial.print(" ");
         for (int j = 0; j < 10; j++)
         {
             Serial.print(field[i][j]);
@@ -92,12 +95,30 @@ bool check_pos(int row, int column, int old_row, int old_column)
         top = row;
     else if (row == 9)
         bottom = row;
+    //test
+    Serial.print(left) ; //0 1 0 2
+    Serial.print(" ") ;
+    Serial.print(right) ;
+    Serial.print(" ") ;
+    Serial.print(top) ; 
+    Serial.print(" ") ;
+    Serial.print(bottom) ;
+    Serial.print(" ") ;
+    Serial.print("\n") ;
 
-    for (int i = top; i <= bottom; i++)
+    for (int i = top; i <= bottom; i++) //0-2
     {
-        for (int j = left; j <= right; j++)
+        for (int j = left; j <= right; j++) //0-1
         {
-            if (field[i][j] && i != old_row && j != old_column)
+
+            Serial.print(i);
+            Serial.print(j);
+            Serial.print(": \n");
+
+            if ((i == old_row) && (j == old_column))
+            {
+            }
+            else if (field[i][j])
                 return false;
         }
     }
@@ -189,7 +210,8 @@ bool is_good_first(int row, int col, int count)
 bool is_good_second(int row, int col,int old_row,int old_col, int count) 
 {
     int top = 0, bottom = 0, left = 0, right = 0;
-    if ((check_pos(row, col, old_row,old_col))&&(is_neighbor(row,col,old_row,old_col)))  //dodatkowo sprawdzenie na sasiedzi
+    if(check_pos(row,col,old_row,old_col)) Serial.print("uwaza ze jest komorka nie graniczonca z innymi");
+    if ((check_pos(row,col,old_row,old_col))&&(is_neighbor(row,col,old_row,old_col)))  //dodatkowo sprawdzenie na sasiedzi
     {
         if (col == old_col)
         { //jesli pionowo
