@@ -1,8 +1,17 @@
 int ship_count[] = {4, 3, 2, 1}; //1os-4 2os-3 3os-2 4os-1
-int field[10][10];  //moje pole
+int field[10][10];  //moje pole 
+                    //0-pusty 
+                    //1-statek nieznany , w ktory nie trafiono
+                    //2-trafiony
+                    //3-zabity
 int field2[10][10]; //obce pole
+                    //0-znany pusty
+                    //1-pole nieznane
+                    //2-trafiony
+                    //3-zabity
 int loose=20,win=0;
-
+int data[4];//1- pionowo,col,min_row,max_row
+            //0- poziomo,row,min_col,max_col
 //wczytywanie 1 liczbe
 int read_sign(){
     int sign = Serial.parseInt();
@@ -53,7 +62,7 @@ void check_and_insert(bool is_goodpos, int row, int col){
     else
         Serial.print("zla pozycja !Wpisz jeszcze raz\n");
 }
-//wyświetlanie pola gry
+//wyświetlanie pola gry //przerobic na taka z przekazywana tabela
 void show_field(){
     Serial.print("  0 1 2 3 4 5 6 7 8 9 ");
     Serial.print("\n");
@@ -430,11 +439,54 @@ void read_ships(int count){
     Serial.print("Koniec wstawiania\n");
 }
 
-void init_void(){ //procedura init; ustawiam wsz wartosci pola na puste
+void insert_send_data(int dir,int k,int k1,int k2){
+    data[0]=dir;data[1]=k;data[2]=k1;data[3]=k2;
+}
+
+bool is_killed(int row,int col){
+    int maxim,minim,i;
+    if(check_pos(row,col,row,col)){
+
+        insert_send_data(0,row,col,col);
+        return true;
+    }
+    else if((field[row-1][col]==2) || (field[row+1][col]==2)){ 
+        //jesli w pionie jest trafiony
+        i=row;
+        while(!(field[i][col])){  //poki nie dojdziesz do pustego idz do gory
+            if(field[i][col]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            minim=i; i--;
+        }
+        i=row;
+        while(!(field[i][col])){  //poki nie dojdziesz do pustego idz do dolu
+            if(field[i][col]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            maxim=i;i++;
+        }
+         insert_send_data(1,col,minim,maxim);
+    }
+    else {  //jesli w poziomie jest trafiony
+        i=row;
+        while(!(field[row][i])){  //poki nie dojdziesz do pustego idz zlewa
+            if(field[row][i]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            minim=i; i--;
+        }
+        i=row;
+        while(!(field[row][i])){  //poki nie dojdziesz do pustego idz z prawa
+            if(field[row][i]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            maxim=i;i++;
+        }
+         insert_send_data(0,row,minim,maxim);
+    }
+    return false;
+}
+void init_void(){ 
+
     for (int i = 0; i < 10; i++)
     {
-        for (int j = 0; j < 10; j++)
-            field[i][j] = 0;
+        for (int j = 0; j < 10; j++){
+            field[i][j] =0; //moje puste
+            field2[i][j]=1;//obce nieznane
+        }
     }
     for (int i = 0; i < 4; i++)
         read_ships(ship_count[i]);
