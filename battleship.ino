@@ -628,8 +628,8 @@ void receiver(){
 
 void init_void(){ 
     int i,j;
-    int ship_count[] = {4, 3, 2, 1}; //1os-4 2os-3 3os-2 4os-1
-    
+    //int ship_count[] = {4, 3, 2, 1}; //1os-4 2os-3 3os-2 4os-1
+
     for (i = 0; i < 10; i++)
     {
         for (j = 0; j < 10; j++){
@@ -637,8 +637,8 @@ void init_void(){
             field2[i][j]=1;//obce nieznane
         }
     }
-    //for (i = 0; i < 4; i++)
-        //read_ships(ship_count[i]);
+    for (i = 4; i >= 1; i--)
+        read_ships(i);
 }
 
 bool game_over(){
