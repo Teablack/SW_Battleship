@@ -14,16 +14,12 @@ int lose=20,win=20;
 int data[4];//1- pionowo,col,min_row,max_row
             //0- poziomo,row,min_col,max_col
 
+
+/*----------------------KOMUNIKACJA-----------------------------------------*/
 //wczytywanie 1 liczbe
 int read_sign(){
     int sign = Serial.parseInt();
     return sign;
-}
-
-void swap(int &a, int &b){
-    int t = a;
-    a = b;
-    b = t;
 }
 //wczytywanie columne albo wiersz
 int read_col_or_row(){
@@ -45,7 +41,7 @@ int read_col_or_row(){
     return n;
 }
 //wczytywanie kroku
-void insertion_row_col(int &row, int &col){
+void insert_key(int &row, int &col){
 
     Serial.print("wpisz wiersz: ");
     row = read_col_or_row();
@@ -64,6 +60,50 @@ void check_and_insert(bool is_goodpos, int row, int col){
     else
         Serial.print("zla pozycja !Wpisz jeszcze raz\n");
 }
+//TUTAJ WYSYLA SIE TO DO INNEGO ARDU ALE JA WYSWIETLAM W KONSOLI HA-HA  
+void send_location(int row,int col){
+    Serial.write("wyslano: ");
+    Serial.write(row);
+    Serial.write(" ");
+    Serial.write(col);
+    Serial.write("\n");
+}
+
+void receive_location(int &row,int &col){
+    Serial.print("wyslij do gracza :");
+    Serial.print("wpisz wiersz: ");
+    row = read_col_or_row();
+    Serial.print(row);
+    Serial.print("\nwpisz kolumne: ");
+    col = read_col_or_row();
+    Serial.print(col);
+    Serial.print("\n");
+}
+
+//wyslij odpowiedz do drugiego gracza
+void send_answer(int a){
+    Serial.print("wysłano ze zabite : ");
+    Serial.print(a);
+    Serial.print("\n");
+}
+
+void receive_answer(int &a){
+    Serial.print("wprowadz odpowiedz: ");
+    a=read_col_or_row();
+}
+//wyslij 2 do 2 gracza i data[] 
+void send_data(){
+    Serial.print("Wyslano datagram");
+}
+
+void receive_data(){
+    for(int i=0;i<4;i++){
+        data[i]=read_col_or_row();
+    }
+}
+
+/*----------------------KOMUNIKACJA-----------------------------------------*/
+
 //wyświetlanie pola gry //przerobic na taka z przekazywana tabela
 void show_field(){
     Serial.print("  0 1 2 3 4 5 6 7 8 9 ");
@@ -80,20 +120,13 @@ void show_field(){
         Serial.print("\n");
     }
 }
-//TUTAJ WYSYLA SIE TO DO INNEGO ARDU ALE JA WYSWIETLAM W KONSOLI HA-HA  
-void send_to_player(int row,int col){
-    Serial.write("wyslano!\n");
+
+void swap(int &a, int &b){
+    int t = a;
+    a = b;
+    b = t;
 }
-//wyslij 3 do drugiego gracza
-void send_killed(){
-    Serial.print(3);
-    Serial.print("zabite");
-}
-//wyslij 2 do 2 gracza i data[] 
-void send_hit(){
-    Serial.print(2);
-    Serial.print("trafione");
-}
+
 //czy sa to sasiednie komorki
 bool is_neighbor(int row, int column, int old_row, int old_column){
     if (row == old_row && ((column - 1 == old_column && column != 0) || (column + 1 == old_column && column != 9)))
@@ -294,14 +327,13 @@ bool is_good_forth(int row, int col, int old_row1, int old_col1, int old_row2, i
 }
 
 //procedury do wczytywania roznych typow statkow
-
 //statek pojedynczy
 void read_1ship(){
     bool is_goodpos = false;
     int row, column;
     while (!is_goodpos)
     {
-        insertion_row_col(row, column);
+        insert_key(row, column);
         is_goodpos = check_pos(row, column, 11, 11);
         check_and_insert(is_goodpos, row, column);
     }
@@ -314,7 +346,7 @@ void read_2ship(){
     int row, column;
     while (!is_goodpos)
     {
-        insertion_row_col(row, column);
+        insert_key(row, column);
         is_goodpos = is_good_first(row, column, 1);
         check_and_insert(is_goodpos, row, column);
     }
@@ -326,7 +358,7 @@ void read_2ship(){
     is_goodpos = false;
     while (!is_goodpos)
     {
-        insertion_row_col(row, column);
+        insert_key(row, column);
         is_goodpos = is_good_second(row, column, old_row, old_column, 0);
         check_and_insert(is_goodpos, row, column);
     }
@@ -339,7 +371,7 @@ void read_3ship(){
     Serial.print("wpisz 1 klocek\n");
     while (!is_goodpos)
     {
-        insertion_row_col(row, column);
+        insert_key(row, column);
         is_goodpos = is_good_first(row, column, 2);
         check_and_insert(is_goodpos, row, column);
     }
@@ -351,7 +383,7 @@ void read_3ship(){
     is_goodpos = false;
     while (!is_goodpos)
     {
-        insertion_row_col(row, column);
+        insert_key(row, column);
         is_goodpos = is_good_second(row, column, old_row1, old_col1, 1);
         check_and_insert(is_goodpos, row, column);
     }
@@ -363,7 +395,7 @@ void read_3ship(){
     is_goodpos = false;
     while (!is_goodpos)
     {
-        insertion_row_col(row, column);
+        insert_key(row, column);
         is_goodpos = is_good_third(row, column, old_row1, old_col1, old_row2, old_col2, 0);
         check_and_insert(is_goodpos, row, column);
     }
@@ -376,7 +408,7 @@ void read_4ship(){
     Serial.print("wpisz 1 klocek\n");
     while (!is_goodpos)
     {
-        insertion_row_col(row, column);
+        insert_key(row, column);
         is_goodpos = is_good_first(row, column, 3);
         check_and_insert(is_goodpos, row, column);
     }
@@ -388,7 +420,7 @@ void read_4ship(){
     is_goodpos = false;
     while (!is_goodpos)
     {
-        insertion_row_col(row, column);
+        insert_key(row, column);
         is_goodpos = is_good_second(row, column, old_row1, old_col1, 2);
         check_and_insert(is_goodpos, row, column);
     }
@@ -400,7 +432,7 @@ void read_4ship(){
     is_goodpos = false;
     while (!is_goodpos)
     {
-        insertion_row_col(row, column);
+        insert_key(row, column);
         is_goodpos = is_good_third(row, column, old_row1, old_col1, old_row2, old_col2, 1);
         check_and_insert(is_goodpos, row, column);
     }
@@ -412,7 +444,7 @@ void read_4ship(){
     is_goodpos = false;
     while (!is_goodpos)
     {
-        insertion_row_col(row, column);
+        insert_key(row, column);
         is_goodpos = is_good_forth(row, column, old_row1, old_col1, old_row2, old_col2, old_row3, old_col3);
         check_and_insert(is_goodpos, row, column);
     }
@@ -456,71 +488,95 @@ void read_ships(int count){
     Serial.print("Koniec wstawiania\n");
 }
 
-void insert_send_data(int dir,int k,int k1,int k2){
-    data[0]=dir;data[1]=k;data[2]=k1;data[3]=k2;
-}
+/*----------------------PROCES GRY----------------------------------------*/
 
-bool is_killed(int row,int col){
-    int maxim,minim,i;
-    if(check_pos(row,col,row,col)){
 
-        insert_send_data(0,row,col,col);
-        return true;
-    }
-    else if((field[row-1][col]==2) || (field[row+1][col]==2)){ 
-        //jesli w pionie jest trafiony
-        i=row;
-        while(!(field[i][col])){  //poki nie dojdziesz do pustego idz do gory
-            if(field[i][col]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
-            minim=i; i--;
-        }
-        i=row;
-        while(!(field[i][col])){  //poki nie dojdziesz do pustego idz do dolu
-            if(field[i][col]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
-            maxim=i;i++;
-        }
-         insert_send_data(1,col,minim,maxim);
-    }
-    else {  //jesli w poziomie jest trafiony
-        i=row;
-        while(!(field[row][i])){  //poki nie dojdziesz do pustego idz zlewa
-            if(field[row][i]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
-            minim=i; i--;
-        }
-        i=row;
-        while(!(field[row][i])){  //poki nie dojdziesz do pustego idz z prawa
-            if(field[row][i]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
-            maxim=i;i++;
-        }
-         insert_send_data(0,row,minim,maxim);
-    }
-    return false;
-}
+// bool is_killed(int row,int col){
+//     int maxim,minim,i;
+//     if(check_pos(row,col,row,col)){
+
+//         insert_send_data(0,row,col,col);
+//         return true;
+//     }
+//     else if((field[row-1][col]==2) || (field[row+1][col]==2)){ 
+//         //jesli w pionie jest trafiony
+//         i=row;
+//         while(!(field[i][col])){  //poki nie dojdziesz do pustego idz do gory
+//             if(field[i][col]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+//             minim=i; i--;
+//         }
+//         i=row;
+//         while(!(field[i][col])){  //poki nie dojdziesz do pustego idz do dolu
+//             if(field[i][col]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+//             maxim=i;i++;
+//         }
+//          insert_send_data(1,col,minim,maxim);
+//     }
+//     else {  //jesli w poziomie jest trafiony
+//         i=row;
+//         while(!(field[row][i])){  //poki nie dojdziesz do pustego idz zlewa
+//             if(field[row][i]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+//             minim=i; i--;
+//         }
+//         i=row;
+//         while(!(field[row][i])){  //poki nie dojdziesz do pustego idz z prawa
+//             if(field[row][i]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+//             maxim=i;i++;
+//         }
+//          insert_send_data(0,row,minim,maxim);
+//     }
+//     return false;
+// }
 
 //ustawia swoje statki na zabite - przerobic na uniwerslne, przekaz tablice
-void set_killed(){
-    int i,j;
-    if(data[0]){
-        j=data[1];
-        for(i=data[2];i<=data[3];i++) field[j][i];
-    }
-    else{
-        j=data[1];
-        for(i=data[2];i<=data[3];i++) field[i][j];
-    }
-}
-//zrobic uniwersalne ?
-void trafiony(int row,int col){
-    if(is_killed){     //jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
-        set_killed();
-        send_killed();
-    }
-    else{               //jesli nie wyslij 2 i ustaw aktualny statek na 2
-        send_hit();
-        field[row][col]=2; //ustaw jako trafiony
-    } ;              
+// void set_killed(){
+//     int i,j;
+//     if(data[0]){
+//         j=data[1];
+//         for(i=data[2];i<=data[3];i++) field[j][i];
+//     }
+//     else{
+//         j=data[1];
+//         for(i=data[2];i<=data[3];i++) field[i][j];
+//     }
+// }
+// //zrobic uniwersalne ?
+// void trafiony(int row,int col){
+//     if(is_killed){     //jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
+//         set_killed();
+//         send_killed();
+//     }
+//     else{               //jesli nie wyslij 2 i ustaw aktualny statek na 2
+//         send_hit();
+//         field[row][col]=2; //ustaw jako trafiony
+//     } ;              
     
-}
+// }
+
+// void sender(){
+//     bool is_goodpos = false;
+//     int row, col;
+//     while (!is_goodpos)
+//     {
+//         Serial.print("wpisz pole innego gracza");
+//         insert_key(row, col); 
+//         if(field2[row][col]) { //jesli pole nieznane 
+//             send_to_player(row,col);
+//             is_goodpos=true;
+//         } 
+//         int a;
+//         get_answer(a);
+//         if(!a) field2[row][col]=0;  //pusty
+//         else if (a==2)  field2[row][col]=2; //trafiony
+//         //else //killed odbior macierzy i wypewnienie przekazywanie field
+
+//     }
+// }
+
+// void receiver(){
+
+// }
+/*----------------------PROCES GRY----------------------------------------*/
 
 void init_void(){ 
     int i,j;
@@ -540,43 +596,18 @@ bool game_over(){
     else return false;
 }
 
-void get_answer(int &a){
-    //тут  без проверки нужно переписать
-    a=read_col_or_row();
-}
-void sender(){
-    bool is_goodpos = false;
-    int row, col;
-    while (!is_goodpos)
-    {
-        Serial.print("wpisz pole innego gracza");
-        insertion_row_col(row, col); 
-        if(field2[row][col]) { //jesli pole nieznane 
-            send_to_player(row,col);
-            is_goodpos=true;
-        } 
-        int a;
-        get_answer(a);
-        if(!a) field2[row][col]=0;  //pusty
-        else if (a==2)  field2[row][col]=2; //trafiony
-        //else //killed odbior macierzy i wypewnienie przekazywanie field
-
-    }
-}
-void receiver(){}
-
 void setup(){
     Serial.begin(9600);
     Serial.print("Start!\n");
     //init_void();
     while(!game_over){
         if(player){ //gdy jestes pierwszy
-            sender();
-            receiver();
+            //sender();
+            //receiver(); 
         }
         else {
-            receiver();
-            sender();
+            //receiver();
+            //sender();
         }
     }
     if(!lose) 
