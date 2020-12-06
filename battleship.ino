@@ -1,5 +1,5 @@
 int  player =  1;
-int ship_count[] = {4, 3, 2, 1}; //1os-4 2os-3 3os-2 4os-1
+
 int field[10][10];  //moje pole 
                     //0-pusty 
                     //1-statek nieznany , w ktory nie trafiono
@@ -628,6 +628,8 @@ void receiver(){
 
 void init_void(){ 
     int i,j;
+    int ship_count[] = {4, 3, 2, 1}; //1os-4 2os-3 3os-2 4os-1
+    
     for (i = 0; i < 10; i++)
     {
         for (j = 0; j < 10; j++){
