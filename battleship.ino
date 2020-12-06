@@ -82,7 +82,7 @@ void receive_location(int &row,int &col){
 
 //wyslij odpowiedz do drugiego gracza
 void send_answer(int a){
-    Serial.print("wysłano ze zabite : ");
+    if(a==3)Serial.print("wysłano ze zabite : ");
     Serial.print(a);
     Serial.print("\n");
 }
@@ -504,27 +504,36 @@ void read_ships(int count){
 
 /*----------------------PROCES GRY----------------------------------------*/
 
-
+//f[2][9]=2 przy f[3][9] zla odpowiedz wyslano ze trafiony dla statku dwuos
 bool is_killed(int row,int col){
+    Serial.print("wszedlem w is killed\n");
     int maxim=0,minim=0,i;
         if((field[row-1][col]==2) || (field[row+1][col]==2)){ 
         //jesli w pionie jest trafiony
+        Serial.print("jest w pionie\n");
         i=row;
-        while((field[i][col])){  //poki nie dojdziesz do pustego idz do gory
+        while((field[i][col])){  //poki nie dojdziesz do pustego idz do gory  (poki jest 1 albo 2)
             if(i<0) break;
             if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
             minim=i; i--;
         }
         i=row;
-        while((field[i][col])){  //poki nie dojdziesz do pustego idz do dolu
+        while((field[i][col])){  //poki nie dojdziesz do pustego idz do dolu (poki jest 1 albo 2)
+            Serial.print("sprawdza statek w dol\n");
+            Serial.print("jest na pozycji :");
+            Serial.print(i);
+            Serial.print(col);
             if(i>9) break;
+            Serial.print("przeszedl przez break\n");
             if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            Serial.print("uwaza ze w tym miejscu nie ma statku=1\n");
             maxim=i;i++;
         }
          insert_in_data(1,col,minim,maxim);
     }
-    else {  //jesli w poziomie jest trafiony
+    else if((field[row][col-1]==2) || (field[row][col+1]==2)) {  //jesli w poziomie jest trafiony
         i=col;
+        Serial.print("jest w poziomie\n");
         while((field[row][i])){  //poki nie dojdziesz do pustego idz zlewa
             if(i<0) break;
             if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
@@ -540,6 +549,7 @@ bool is_killed(int row,int col){
         }
         insert_in_data(0,row,minim,maxim);
     }
+    else return false;
     Serial.print("\n");
     print_data();
     return true;
@@ -551,7 +561,7 @@ void set_killed(int (&f)[10][10], int my){
     if(data[0]){
         j=data[1];
         for(i=data[2];i<=data[3];i++) {
-            f[j][i]=3;
+            f[i][j]=3;
             if(my) lose--;
             else win--;
         };
@@ -560,7 +570,7 @@ void set_killed(int (&f)[10][10], int my){
     else{
         j=data[1];
         for(i=data[2];i<=data[3];i++) {
-            f[i][j]=3;
+            f[j][i]=3;
             if(my) lose--;
             else win--;
         }
@@ -568,14 +578,17 @@ void set_killed(int (&f)[10][10], int my){
 }
 
 void trafiony(int row,int col){
-    if(is_killed){     //jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
+    field[row][col]=2; //ustaw jako trafiony
+    bool a = is_killed(row,col);
+    if(a){     //jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
+        
         set_killed(field,1);
         send_answer(3);
         send_data();
+        show_field(field);
 
     }
     else{               //jesli nie wyslij 2 i ustaw aktualny statek na 2
-        field[row][col]=2; //ustaw jako trafiony
         send_answer(2);
     };              
     
@@ -664,12 +677,14 @@ void run_game(){
             sender();
             a=game_over();
             if(!a)receiver(); 
+            show_field(field);
     }
     else {
             receiver();
             show_field(field2);
             a=game_over();
             if(!a)sender();
+            show_field(field);
     }
 }
 void test1(){
