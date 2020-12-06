@@ -507,11 +507,11 @@ void read_ships(int count){
 
 //f[2][9]=2 przy f[3][9] zla odpowiedz wyslano ze trafiony dla statku dwuos
 bool is_killed(int row,int col){
-    Serial.print("wszedlem w is killed\n");
+
     int maxim=0,minim=0,i;
         if((field[row-1][col]==2) || (field[row+1][col]==2)){ 
         //jesli w pionie jest trafiony
-        Serial.print("jest w pionie\n");
+    
         i=row;
         while((field[i][col])){  //poki nie dojdziesz do pustego idz do gory  (poki jest 1 albo 2)
             if(i<0) break;
@@ -520,21 +520,15 @@ bool is_killed(int row,int col){
         }
         i=row;
         while((field[i][col])){  //poki nie dojdziesz do pustego idz do dolu (poki jest 1 albo 2)
-            Serial.print("sprawdza statek w dol\n");
-            Serial.print("jest na pozycji :");
-            Serial.print(i);
-            Serial.print(col);
+            
             if(i>9) break;
-            Serial.print("przeszedl przez break\n");
             if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
-            Serial.print("uwaza ze w tym miejscu nie ma statku=1\n");
             maxim=i;i++;
         }
          insert_in_data(1,col,minim,maxim);
     }
     else if((field[row][col-1]==2) || (field[row][col+1]==2)) {  //jesli w poziomie jest trafiony
         i=col;
-        Serial.print("jest w poziomie\n");
         while((field[row][i])){  //poki nie dojdziesz do pustego idz zlewa
             if(i<0) break;
             if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
