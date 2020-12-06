@@ -83,6 +83,7 @@ void receive_location(int &row,int &col){
 //wyslij odpowiedz do drugiego gracza
 void send_answer(int a){
     if(a==3)Serial.print("wysłano ze zabite : ");
+    else if(a==2)Serial.print("wysłano ze trafiono : ");
     Serial.print(a);
     Serial.print("\n");
 }
@@ -93,7 +94,7 @@ void receive_answer(int &a){
 }
 //wyslij 2 do 2 gracza i data[] 
 void send_data(){
-    Serial.print("Wyslano datagram");
+    Serial.print("Wyslano datagram\n");
 }
 
 void receive_data(){
