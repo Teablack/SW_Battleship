@@ -97,7 +97,9 @@ void send_data(){
 }
 
 void receive_data(){
+    Serial.print("przekaz datagram");
     for(int i=0;i<4;i++){
+        Serial.print("znak:");
         data[i]=read_col_or_row();
     }
 }
@@ -528,18 +530,7 @@ void read_ships(int count){
 //     return false;
 // }
 
-//ustawia swoje statki na zabite - przerobic na uniwerslne, przekaz tablice
-// void set_killed(){
-//     int i,j;
-//     if(data[0]){
-//         j=data[1];
-//         for(i=data[2];i<=data[3];i++) field[j][i];
-//     }
-//     else{
-//         j=data[1];
-//         for(i=data[2];i<=data[3];i++) field[i][j];
-//     }
-// }
+
 // //zrobic uniwersalne ?
 // void trafiony(int row,int col){
 //     if(is_killed){     //jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
@@ -553,29 +544,49 @@ void read_ships(int count){
     
 // }
 
-// void sender(){
-//     bool is_goodpos = false;
-//     int row, col;
-//     while (!is_goodpos)
-//     {
-//         Serial.print("wpisz pole innego gracza");
-//         insert_key(row, col); 
-//         if(field2[row][col]) { //jesli pole nieznane 
-//             send_to_player(row,col);
-//             is_goodpos=true;
-//         } 
-//         int a;
-//         get_answer(a);
-//         if(!a) field2[row][col]=0;  //pusty
-//         else if (a==2)  field2[row][col]=2; //trafiony
-//         //else //killed odbior macierzy i wypewnienie przekazywanie field
+//ustawia OBCE statki na zabite - przerobic na uniwerslne, przekaz tablice
+void set_killed(){
+    int i,j;
+    if(data[0]){
+        j=data[1];
+        for(i=data[2];i<=data[3];i++) field2[j][i];
+        //obce win--; swoje lose--;
+    }
+    else{
+        j=data[1];
+        for(i=data[2];i<=data[3];i++) field2[i][j];
+        //obce win--; swoje lose--;
+    }
+}
 
-//     }
-// }
+void sender(){
+    bool again=true;
+    while(again){
+        bool is_goodpos = false;
+        int row, col;
+        again=false;
+        
+        while (!is_goodpos)
+        {
+            Serial.print("wpisz pole innego gracza\n");
+            insert_key(row, col); 
+            if(field2[row][col]) { //jesli pole nieznane 
+                send_location(row,col);
+                is_goodpos=true;
+            } 
+            int a;
+            receive_answer(a);
+            if(!a) field2[row][col]=0;  //pusty
+            else if (a==2) { field2[row][col]=2; again=true;}
+            else {receive_data();set_killed();} //killed odbior macierzy i wypewnienie na killed !napisac fukcje uniw z przekaz argumentow
+        }
+    }
+}
 
-// void receiver(){
+void receiver(){
 
-// }
+}
+
 /*----------------------PROCES GRY----------------------------------------*/
 
 void init_void(){ 
@@ -600,19 +611,19 @@ void setup(){
     Serial.begin(9600);
     Serial.print("Start!\n");
     //init_void();
-    while(!game_over){
+    while(game_over){
         if(player){ //gdy jestes pierwszy
-            //sender();
-            //receiver(); 
+            sender();
+            receiver(); 
         }
         else {
-            //receiver();
-            //sender();
+            receiver();
+            sender();
         }
     }
     if(!lose) 
         Serial.print("przegrales");
-    else 
+    else
         Serial.print("wygrales");
 }
 
