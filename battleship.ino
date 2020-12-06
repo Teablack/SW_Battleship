@@ -545,34 +545,43 @@ bool is_killed(int row,int col){
     return true;
 }
 
-
-// //zrobic uniwersalne ?
-// void trafiony(int row,int col){
-//     if(is_killed){     //jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
-//         set_killed();
-//         send_killed();
-//     }
-//     else{               //jesli nie wyslij 2 i ustaw aktualny statek na 2
-//         send_hit();
-//         field[row][col]=2; //ustaw jako trafiony
-//     } ;              
-    
-// }
-
-//ustawia OBCE statki na zabite - przerobic na uniwerslne, przekaz tablice
-void set_killed(){
+//ustawia statki na zabite 
+void set_killed(int (&f)[10][10], int my){
     int i,j;
     if(data[0]){
         j=data[1];
-        for(i=data[2];i<=data[3];i++) field2[j][i];
-        //obce win--; swoje lose--;
+        for(i=data[2];i<=data[3];i++) {
+            f[j][i]=3;
+            if(my) lose--;
+            else win--;
+        };
+        
     }
     else{
         j=data[1];
-        for(i=data[2];i<=data[3];i++) field2[i][j];
-        //obce win--; swoje lose--;
+        for(i=data[2];i<=data[3];i++) {
+            f[i][j]=3;
+            if(my) lose--;
+            else win--;
+        }
     }
 }
+
+void trafiony(int row,int col){
+    if(is_killed){     //jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
+        set_killed(field,1);
+        send_answer(3);
+        send_data();
+
+    }
+    else{               //jesli nie wyslij 2 i ustaw aktualny statek na 2
+        field[row][col]=2; //ustaw jako trafiony
+        send_answer(2);
+    };              
+    
+}
+
+
 
 void sender(){
     bool again=true;
@@ -602,7 +611,7 @@ void sender(){
                 else {
                     Serial.print("zabiles\n");
                     receive_data();
-                    set_killed(); 
+                    set_killed(field2,0); 
                     again=true;} //killed odbior macierzy i wypewnienie na killed !napisac fukcje uniw z przekaz argumentow
             }   
             else Serial.print("Pole juz bylo wybierane!\n");
@@ -631,20 +640,23 @@ void init_void(){
 }
 
 bool game_over(){
-    if(!lose || !win) return true;
-    else return false;
+    if((lose!=0) && (win!=0)) return false;
+    else return true;
 }
 
 void run_game(){
+    bool a;
     if(player){ //gdy jestes pierwszy
             show_field(field2);
             sender();
-            receiver(); 
+            a=game_over();
+            if(!a)receiver(); 
     }
     else {
             receiver();
             show_field(field2);
-            sender();
+            a=game_over();
+            if(!a)sender();
     }
 }
 
@@ -652,19 +664,20 @@ void setup(){
     Serial.begin(9600);
     Serial.print("Start!\n");
     init_void();
-    // while(game_over){
-    //     run_game();
-    // }
-    // if(!lose) 
-    //     Serial.print("przegrales");
-    // else
-    //     Serial.print("wygrales");
+    bool a=game_over();
+    while(!a){
+        run_game();
+    }
+    if(!lose) 
+        Serial.print("przegrales");
+    else
+        Serial.print("wygrales");
 
-    int i=0 ,j=0 ;
-    field[i][j]=2;
-    field[0][1]=2;
-    if(is_killed(i,j)) Serial.print("zabity");
-    else Serial.print("nie zabity");
+    // int i=0 ,j=0 ;
+    // field[i][j]=2;
+    // field[0][1]=2;
+    // if(is_killed(i,j)) Serial.print("zabity");
+    // else Serial.print("nie zabity");
 }
 
 void loop(){
