@@ -97,13 +97,25 @@ void send_data(){
 }
 
 void receive_data(){
-    Serial.print("przekaz datagram");
+    Serial.print("odebrales datagram");
     for(int i=0;i<4;i++){
         Serial.print("znak:");
         data[i]=read_col_or_row();
     }
 }
 
+void insert_in_data(int dir,int k,int k1,int k2){
+    data[0]=dir;
+    data[1]=k;
+    data[2]=k1;
+    data[3]=k2;
+}
+//dla testow
+void print_data(){
+    for(int i =0;i<4;i++){
+        Serial.print(data[i]);
+    }
+}
 /*----------------------KOMUNIKACJA-----------------------------------------*/
 
 //wyświetlanie pola gry //przerobic na taka z przekazywana tabela
@@ -493,42 +505,45 @@ void read_ships(int count){
 /*----------------------PROCES GRY----------------------------------------*/
 
 
-// bool is_killed(int row,int col){
-//     int maxim,minim,i;
-//     if(check_pos(row,col,row,col)){
-
-//         insert_send_data(0,row,col,col);
-//         return true;
-//     }
-//     else if((field[row-1][col]==2) || (field[row+1][col]==2)){ 
-//         //jesli w pionie jest trafiony
-//         i=row;
-//         while(!(field[i][col])){  //poki nie dojdziesz do pustego idz do gory
-//             if(field[i][col]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
-//             minim=i; i--;
-//         }
-//         i=row;
-//         while(!(field[i][col])){  //poki nie dojdziesz do pustego idz do dolu
-//             if(field[i][col]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
-//             maxim=i;i++;
-//         }
-//          insert_send_data(1,col,minim,maxim);
-//     }
-//     else {  //jesli w poziomie jest trafiony
-//         i=row;
-//         while(!(field[row][i])){  //poki nie dojdziesz do pustego idz zlewa
-//             if(field[row][i]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
-//             minim=i; i--;
-//         }
-//         i=row;
-//         while(!(field[row][i])){  //poki nie dojdziesz do pustego idz z prawa
-//             if(field[row][i]) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
-//             maxim=i;i++;
-//         }
-//          insert_send_data(0,row,minim,maxim);
-//     }
-//     return false;
-// }
+bool is_killed(int row,int col){
+    int maxim=0,minim=0,i;
+        if((field[row-1][col]==2) || (field[row+1][col]==2)){ 
+        //jesli w pionie jest trafiony
+        i=row;
+        while((field[i][col])){  //poki nie dojdziesz do pustego idz do gory
+            if(i<0) break;
+            if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            minim=i; i--;
+        }
+        i=row;
+        while((field[i][col])){  //poki nie dojdziesz do pustego idz do dolu
+            if(i>9) break;
+            if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            maxim=i;i++;
+        }
+         insert_in_data(1,col,minim,maxim);
+    }
+    else {  //jesli w poziomie jest trafiony
+        i=col;
+        while((field[row][i])){  //poki nie dojdziesz do pustego idz zlewa
+            if(i<0) break;
+            if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            minim=i;  i--;                 
+        }
+        i=col;
+        while((field[row][i])){  //poki nie dojdziesz do pustego idz z prawa
+            
+            if(i>9) break;
+            if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            maxim=i; i++;
+            
+        }
+        insert_in_data(0,row,minim,maxim);
+    }
+    Serial.print("\n");
+    print_data();
+    return true;
+}
 
 
 // //zrobic uniwersalne ?
@@ -620,26 +635,36 @@ bool game_over(){
     else return false;
 }
 
+void run_game(){
+    if(player){ //gdy jestes pierwszy
+            show_field(field2);
+            sender();
+            receiver(); 
+    }
+    else {
+            receiver();
+            show_field(field2);
+            sender();
+    }
+}
+
 void setup(){
     Serial.begin(9600);
     Serial.print("Start!\n");
     init_void();
-    while(game_over){
-        if(player){ //gdy jestes pierwszy
-            show_field(field2);
-            sender();
-            receiver(); 
-        }
-        else {
-            receiver();
-            show_field(field2);
-            sender();
-        }
-    }
-    if(!lose) 
-        Serial.print("przegrales");
-    else
-        Serial.print("wygrales");
+    // while(game_over){
+    //     run_game();
+    // }
+    // if(!lose) 
+    //     Serial.print("przegrales");
+    // else
+    //     Serial.print("wygrales");
+
+    int i=0 ,j=0 ;
+    field[i][j]=2;
+    field[0][1]=2;
+    if(is_killed(i,j)) Serial.print("zabity");
+    else Serial.print("nie zabity");
 }
 
 void loop(){
