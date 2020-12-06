@@ -578,7 +578,7 @@ void sender(){
             receive_answer(a);
             if(!a) field2[row][col]=0;  //pusty
             else if (a==2) { field2[row][col]=2; again=true;}
-            else {receive_data();set_killed();} //killed odbior macierzy i wypewnienie na killed !napisac fukcje uniw z przekaz argumentow
+            else {receive_data();set_killed(); again=true;} //killed odbior macierzy i wypewnienie na killed !napisac fukcje uniw z przekaz argumentow
         }
     }
 }
