@@ -107,7 +107,7 @@ void receive_data(){
 /*----------------------KOMUNIKACJA-----------------------------------------*/
 
 //wyświetlanie pola gry //przerobic na taka z przekazywana tabela
-void show_field(){
+void show_field(int (&f)[10][10]){
     Serial.print("  0 1 2 3 4 5 6 7 8 9 ");
     Serial.print("\n");
     for (int i = 0; i < 10; i++)
@@ -116,7 +116,7 @@ void show_field(){
         Serial.print(" ");
         for (int j = 0; j < 10; j++)
         {
-            Serial.print(field[i][j]);
+            Serial.print(f[i][j]);
             Serial.print(" ");
         }
         Serial.print("\n");
@@ -354,7 +354,7 @@ void read_2ship(){
     }
 
     int old_row = row, old_column = column;
-    show_field();
+    show_field(field);
     Serial.print("wpisz drugi klocek\n");
 
     is_goodpos = false;
@@ -379,7 +379,7 @@ void read_3ship(){
     }
 
     int old_row1 = row, old_col1 = column;
-    show_field();
+    show_field(field);
 
     Serial.print("wpisz 2 klocek\n");
     is_goodpos = false;
@@ -391,7 +391,7 @@ void read_3ship(){
     }
 
     int old_row2 = row, old_col2 = column;
-    show_field();
+    show_field(field);
 
     Serial.print("wpisz 3 klocek\n");
     is_goodpos = false;
@@ -416,7 +416,7 @@ void read_4ship(){
     }
 
     int old_row1 = row, old_col1 = column;
-    show_field();
+    show_field(field);
 
     Serial.print("wpisz 2 klocek\n");
     is_goodpos = false;
@@ -428,7 +428,7 @@ void read_4ship(){
     }
 
     int old_row2 = row, old_col2 = column;
-    show_field();
+    show_field(field);
     Serial.print("wpisz 3 klocek\n");
 
     is_goodpos = false;
@@ -440,7 +440,7 @@ void read_4ship(){
     }
 
     int old_row3 = row, old_col3 = column;
-    show_field();
+    show_field(field);
     Serial.print("wpisz 4 klocek\n");
 
     is_goodpos = false;
@@ -463,7 +463,7 @@ void read_ships(int count){
         for (i = 0; i < count; i++)
         {
             read_1ship();
-            show_field();
+            show_field(field);
         }
         break;
     case 3:
@@ -471,20 +471,20 @@ void read_ships(int count){
         for (i = 0; i < count; i++)
         {
             read_2ship();
-            show_field();
+            show_field(field);
         }
         break; 
     case 2:
         Serial.print("Wpisz statki podtrojne\n");
         read_3ship();
-        show_field();
+        show_field(field);
         read_3ship();
-        show_field();
+        show_field(field);
         break; 
     case 1:
         Serial.print("Wpisz statek czwarty\n");
         read_4ship();
-        show_field();
+        show_field(field);
         break;
     }
     Serial.print("Koniec wstawiania\n");
