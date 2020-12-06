@@ -621,7 +621,19 @@ void sender(){
 }
 
 void receiver(){
-
+    bool again=true;
+    while(again){
+        int row, col;
+        again=false;
+        Serial.print("inny gracz wysyla do ciebie \n");
+        receive_location(row,col);
+        if(field[row][col]==0) send_answer(0);  //jesli pusty
+        else {
+            trafiony(row,col);
+            again=true;
+        }
+        show_field(field2);
+    }
 }
 
 /*----------------------PROCES GRY----------------------------------------*/
