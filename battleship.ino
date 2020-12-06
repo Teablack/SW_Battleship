@@ -88,7 +88,7 @@ void send_answer(int a){
 }
 
 void receive_answer(int &a){
-    Serial.print("wprowadz odpowiedz: ");
+    Serial.print("wprowadz odpowiedz\n");
     a=read_col_or_row();
 }
 //wyslij 2 do 2 gracza i data[] 
@@ -565,21 +565,34 @@ void sender(){
         bool is_goodpos = false;
         int row, col;
         again=false;
-        
         while (!is_goodpos)
         {
             Serial.print("wpisz pole innego gracza\n");
             insert_key(row, col); 
-            if(field2[row][col]) { //jesli pole nieznane 
+            if(field2[row][col]==1) { //jesli pole nieznane (=1)
                 send_location(row,col);
                 is_goodpos=true;
-            } 
-            int a;
-            receive_answer(a);
-            if(!a) field2[row][col]=0;  //pusty
-            else if (a==2) { field2[row][col]=2; again=true;}
-            else {receive_data();set_killed(); again=true;} //killed odbior macierzy i wypewnienie na killed !napisac fukcje uniw z przekaz argumentow
+                int a;
+                receive_answer(a);
+                if(!a) {
+                    Serial.print("nie trafiles\n");
+                    field2[row][col]=0;
+                
+                }  //pusty
+                else if (a==2) { 
+                    Serial.print("Trafiles\n");
+                    field2[row][col]=2; 
+                    again=true;
+                }
+                else {
+                    Serial.print("zabiles\n");
+                    receive_data();
+                    set_killed(); 
+                    again=true;} //killed odbior macierzy i wypewnienie na killed !napisac fukcje uniw z przekaz argumentow
+            }   
+            else Serial.print("Pole juz bylo wybierane!\n");
         }
+        show_field(field2);
     }
 }
 
@@ -598,8 +611,8 @@ void init_void(){
             field2[i][j]=1;//obce nieznane
         }
     }
-    for (i = 0; i < 4; i++)
-        read_ships(ship_count[i]);
+    //for (i = 0; i < 4; i++)
+        //read_ships(ship_count[i]);
 }
 
 bool game_over(){
@@ -610,14 +623,16 @@ bool game_over(){
 void setup(){
     Serial.begin(9600);
     Serial.print("Start!\n");
-    //init_void();
+    init_void();
     while(game_over){
         if(player){ //gdy jestes pierwszy
+            show_field(field2);
             sender();
             receiver(); 
         }
         else {
             receiver();
+            show_field(field2);
             sender();
         }
     }
