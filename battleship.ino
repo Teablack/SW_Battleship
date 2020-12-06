@@ -640,7 +640,6 @@ void receiver(){
 
 void init_void(){ 
     int i,j;
-    //int ship_count[] = {4, 3, 2, 1}; //1os-4 2os-3 3os-2 4os-1
 
     for (i = 0; i < 10; i++)
     {
@@ -649,8 +648,8 @@ void init_void(){
             field2[i][j]=1;//obce nieznane
         }
     }
-    for (i = 4; i >= 1; i--)
-        read_ships(i);
+    // for (i = 4; i >= 1; i--)
+    //     read_ships(i);
 }
 
 bool game_over(){
@@ -673,11 +672,31 @@ void run_game(){
             if(!a)sender();
     }
 }
-
+void test1(){
+    //jednoos
+    field[0][3]=1;
+    field[0][7]=1;
+    field[9][5]=1;
+    field[9][9]=1;
+    //dwuos
+    field[2][5]=1;
+    field[3][5]=1;
+    field[2][9]=1;
+    field[3][9]=1;
+    field[4][2]=1;
+    field[4][3]=1;
+    //trzyos
+    for(int i=7;i<10;i++)  field[i][2]=1;
+    for(int i=5;i<8;i++)  field[i][7]=1;
+    for(int i=1;i<5;i++)  field[i][0]=1;
+    show_field(field);
+    Serial.print("\n");
+}
 void setup(){
     Serial.begin(9600);
     Serial.print("Start!\n");
     init_void();
+    test1();
     bool a=game_over();
     while(!a){
         run_game();
@@ -687,11 +706,6 @@ void setup(){
     else
         Serial.print("wygrales");
 
-    // int i=0 ,j=0 ;
-    // field[i][j]=2;
-    // field[0][1]=2;
-    // if(is_killed(i,j)) Serial.print("zabity");
-    // else Serial.print("nie zabity");
 }
 
 void loop(){
