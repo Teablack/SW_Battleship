@@ -1,4 +1,4 @@
-int  player =  1;
+#define  player 1
 
 int field[10][10];  //moje pole 
                     //0-pusty 
@@ -13,7 +13,6 @@ int field2[10][10]; //obce pole
 int lose=20,win=20;
 int data[4];//1- pionowo,col,min_row,max_row
             //0- poziomo,row,min_col,max_col
-
 
 /*----------------------KOMUNIKACJA-----------------------------------------*/
 //wczytywanie 1 liczbe
