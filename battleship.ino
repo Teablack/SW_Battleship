@@ -342,11 +342,13 @@ void read_ships(){
 
 bool is_killed(int row,int col){
 
+    bool a =check_pos(row,col,row,col);
     int maxim=0,minim=0,i;
-        if((field[row-1][col]==2) || (field[row+1][col]==2)){ 
+    if((field[row-1][col]==2) || (field[row+1][col]==2)){ 
         //jesli w pionie jest trafiony
     
         i=row;
+        maxim=i;minim=i;
         while((field[i][col])){  //poki nie dojdziesz do pustego idz do gory  (poki jest 1 albo 2)
             if(i<0) break;
             if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
@@ -360,28 +362,31 @@ bool is_killed(int row,int col){
             maxim=i;i++;
         }
          insert_in_data(1,col,minim,maxim);
+         return true;
     }
     else if((field[row][col-1]==2) || (field[row][col+1]==2)) {  //jesli w poziomie jest trafiony
         i=col;
+        maxim=i;minim=i;
         while((field[row][i])){  //poki nie dojdziesz do pustego idz zlewa
             if(i<0) break;
-            if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            if((field[row][i])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
             minim=i;  i--;                 
         }
         i=col;
         while((field[row][i])){  //poki nie dojdziesz do pustego idz z prawa
             
             if(i>9) break;
-            if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            if((field[row][i])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
             maxim=i; i++;
             
         }
+        
         insert_in_data(0,row,minim,maxim);
+        return true;
     }
-    else return false;
-    Serial.print("\n");
-    print_data();
-    return true;
+    else if(a){insert_in_data(0,row,col,col);return true;};
+    return false;
+   
 }
 //ustawia statki na zabite 
 void set_killed(int (&f)[10][10], int my){
@@ -488,7 +493,7 @@ void init_void(){
         }
     }
     Serial.println("Wpisz statki");
-    read_ships();
+    //read_ships();
 }
 
 bool game_over(){
@@ -537,15 +542,15 @@ void setup(){
     Serial.begin(9600);
     
     init_void();
-    // //test1();
-    // bool a=game_over();
-    // while(!a){
-    //     run_game();
-    // }
-    // if(!lose) 
-    //     Serial.print("przegrales");
-    // else
-    //     Serial.print("wygrales");
+    test1();
+    bool a=game_over();
+    while(!a){
+        run_game();
+    }
+    if(!lose) 
+        Serial.print("przegrales");
+    else
+        Serial.print("wygrales");
 
 }
 
