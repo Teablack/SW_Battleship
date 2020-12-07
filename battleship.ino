@@ -277,7 +277,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
         if (top_count(row, col, size - 1, 11, 11) == (size - 1)){
             
             for (i = col; i > col - size; i--)
-                field[i][row] = 1;
+                field[i][col] = 1;
             return true;    
         }   
         break;
@@ -285,7 +285,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
         if (bottom_count(row, col, size - 1, 11, 11) == (size - 1)){
             
             for (i = col; i < col + size; i++)
-                field[i][row] = 1;
+                field[i][col] = 1;
             return true;
         }
         break;
@@ -293,7 +293,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
         if (left_count(row, col, size - 1, 11, 11) == (size - 1)){
             
             for (i = row; i > row - size; i--)
-                field[i][col] = 1;
+                field[row][i] = 1;
             return true;
         }
         break;
@@ -301,7 +301,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
         if (right_count(row, col, size - 1, 11, 11) == (size - 1)){
             
             for (i = row; i < row + size; i++)
-                field[i][col] = 1;
+                field[row][i] = 1;
             return true;    
         }
         break;
