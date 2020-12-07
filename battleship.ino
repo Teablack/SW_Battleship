@@ -244,6 +244,46 @@ int right_count(int row, int col, int count, int b1, int b2){
     return right;
 }
 
+bool is_good_and_insert(int row, int col, int dir, int size)
+{
+    int i;
+    switch (dir){
+    case 1:
+        if (top_count(row, col, size - 1, 11, 11) == (size - 1)){
+            Serial.println("przeszedlem warunek");
+            for (i = row; i >= row - size+1; i--)
+                field[i][col] = 1;
+            return true;    
+        }   
+        break;
+    case 2:
+        if (bottom_count(row, col, size - 1, 11, 11) == (size - 1)){
+            
+            for (i = row; i <= row + size-1; i++)
+                field[i][col] = 1;
+            return true;
+        }
+        break;
+    case 3:
+        if (left_count(row, col, size - 1, 11, 11) == (size - 1)){
+            
+            for (i = col; i >= col - size+1; i--)
+                field[row][i] = 1;
+            return true;
+        }
+        break;
+    case 4:
+        if (right_count(row, col, size - 1, 11, 11) == (size - 1)){
+            
+            for (i = col; i <= col + size-1; i++)
+                field[row][i] = 1;
+            return true;    
+        }
+        break;
+    }
+    return false;
+}
+
 //procedury do wczytywania roznych typow statkow
 //statek pojedynczy
 void read_ship(int size){
@@ -254,14 +294,17 @@ void read_ship(int size){
         if(size!=1){
             insert_key_with_dir(row,col,dir);
             is_goodpos = check_pos(row, col, 11, 11);
-            is_good_ship=is_good_and_insert(row,col,dir,size);
+            if(is_goodpos)is_good_ship=is_good_and_insert(row,col,dir,size);
         }
         else{
+          Serial.println("statek 1os");
             insert_key(row,col);
             is_goodpos = check_pos(row, col, 11, 11);
-            is_good_ship=is_good_and_insert(row,col,1,size);
+            if(is_goodpos)is_good_ship=is_good_and_insert(row,col,1,size);
         }
-        if(is_goodpos&&is_good_ship) Serial.print("wstawiono\n");
+        
+
+        if(is_good_ship) Serial.print("wstawiono\n");
         else {
             Serial.print("bledna lokalizacja \n");
             is_goodpos=false;
@@ -269,45 +312,7 @@ void read_ship(int size){
     }
 }
 
-bool is_good_and_insert(int row, int col, int dir, int size)
-{
-    int i;
-    switch (dir){
-    case 1:
-        if (top_count(row, col, size - 1, 11, 11) == (size - 1)){
-            
-            for (i = col; i > col - size; i--)
-                field[i][col] = 1;
-            return true;    
-        }   
-        break;
-    case 2:
-        if (bottom_count(row, col, size - 1, 11, 11) == (size - 1)){
-            
-            for (i = col; i < col + size; i++)
-                field[i][col] = 1;
-            return true;
-        }
-        break;
-    case 3:
-        if (left_count(row, col, size - 1, 11, 11) == (size - 1)){
-            
-            for (i = row; i > row - size; i--)
-                field[row][i] = 1;
-            return true;
-        }
-        break;
-    case 4:
-        if (right_count(row, col, size - 1, 11, 11) == (size - 1)){
-            
-            for (i = row; i < row + size; i++)
-                field[row][i] = 1;
-            return true;    
-        }
-        break;
-    }
-    return false;
-}
+
 //wczytywanie wszystkich statkow
 void read_ships(){
     int i;
