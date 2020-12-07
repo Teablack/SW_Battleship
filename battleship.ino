@@ -251,7 +251,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
     case 1:
         if (top_count(row, col, size - 1, 11, 11) == (size - 1)){
             Serial.println("przeszedlem warunek");
-            for (i = row; i >= row - size+1; i--)
+            for (i = row; i > row - size; i--)
                 field[i][col] = 1;
             return true;    
         }   
@@ -259,7 +259,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
     case 2:
         if (bottom_count(row, col, size - 1, 11, 11) == (size - 1)){
             
-            for (i = row; i <= row + size-1; i++)
+            for (i = row; i < row + size; i++)
                 field[i][col] = 1;
             return true;
         }
@@ -267,7 +267,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
     case 3:
         if (left_count(row, col, size - 1, 11, 11) == (size - 1)){
             
-            for (i = col; i >= col - size+1; i--)
+            for (i = col; i > col - size; i--)
                 field[row][i] = 1;
             return true;
         }
@@ -275,7 +275,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
     case 4:
         if (right_count(row, col, size - 1, 11, 11) == (size - 1)){
             
-            for (i = col; i <= col + size-1; i++)
+            for (i = col; i < col + size; i++)
                 field[row][i] = 1;
             return true;    
         }
