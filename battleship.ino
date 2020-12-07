@@ -94,37 +94,36 @@ void send_location(int row,int col){
 }
 
 void receive_location(int &row,int &col){
-    Serial.print("wyslij do gracza :");
-    Serial.print("wpisz wiersz: ");
+    Serial.println("wyslij do gracza :");
+    Serial.println("wpisz wiersz: ");
     row = read_col_or_row();
     Serial.print(row);
-    Serial.print("\nwpisz kolumne: ");
+    Serial.println("wpisz kolumne: ");
     col = read_col_or_row();
     Serial.print(col);
-    Serial.print("\n");
+    
 }
 
 //wyslij odpowiedz do drugiego gracza
 void send_answer(int a){
-    if(a==3)Serial.print("wysłano ze zabite : ");
-    else if(a==2)Serial.print("wysłano ze trafiono : ");
+    if(a==3)Serial.println("wysłano ze zabite : ");
+    else if(a==2)Serial.println("wysłano ze trafiono : ");
     Serial.print(a);
-    Serial.print("\n");
 }
 
 void receive_answer(int &a){
-    Serial.print("wprowadz odpowiedz\n");
+    Serial.println("wprowadz odpowiedz");
     a=read_col_or_row();
 }
 //wyslij 2 do 2 gracza i data[] 
 void send_data(){
-    Serial.print("Wyslano datagram\n");
+    Serial.println("Wyslano datagram");
 }
 
 void receive_data(){
-    Serial.print("odebrales datagram");
+    Serial.println("odebrales datagram");
     for(int i=0;i<4;i++){
-        Serial.print("znak:");
+        Serial.println("znak:");
         data[i]=read_col_or_row();
     }
 }
@@ -252,11 +251,21 @@ void read_ship(int size){
     int row, col,dir;
     while (!is_goodpos)
     {
-        insert_key_with_dir(row,col,dir);
-        is_goodpos = check_pos(row, col, 11, 11);
-        is_good_ship=is_good_and_insert(row,col,dir,size);
+        if(size!=1){
+            insert_key_with_dir(row,col,dir);
+            is_goodpos = check_pos(row, col, 11, 11);
+            is_good_ship=is_good_and_insert(row,col,dir,size);
+        }
+        else{
+            insert_key(row,col);
+            is_goodpos = check_pos(row, col, 11, 11);
+            is_good_ship=is_good_and_insert(row,col,1,size);
+        }
         if(is_goodpos&&is_good_ship) Serial.print("wstawiono\n");
-        else is_goodpos=false;
+        else {
+            Serial.print("bledna lokalizacja \n");
+            is_goodpos=false;
+        }
     }
 }
 
