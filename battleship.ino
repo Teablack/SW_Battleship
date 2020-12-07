@@ -83,15 +83,7 @@ void insert_key(int &row, int &col){
     Serial.print(col);
     Serial.print("\n");
 }
-//wstawianie elementu statku
-void check_and_insert(bool is_goodpos, int row, int col){
-    if (is_goodpos)
-    {
-        field[row][col] = 1;
-    }
-    else
-        Serial.print("zla pozycja !Wpisz jeszcze raz\n");
-}
+
 //TUTAJ WYSYLA SIE TO DO INNEGO ARDU ALE JA WYSWIETLAM W KONSOLI HA-HA  
 void send_location(int row,int col){
     Serial.write("wyslano: ");
