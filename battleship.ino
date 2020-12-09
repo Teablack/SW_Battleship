@@ -28,6 +28,7 @@ public:
 
     Display(int e1, int e2, int e3, int e4, int e5, int e6)
     {
+        cLook[0] = " ";
         cLook[1] = "@";
         cLook[2] = "/";  
         cLook[3] = "X";
@@ -76,7 +77,7 @@ int read_col_or_row(){
         n = read_sign();
         if (n > 9 || n < 0)
         {
-            Serial.print("bledne dane! Wpisz jeszcze raz\n"); //!przerobic na czytaj z klawiatury!
+            show_message("wpisz ponownie"); //!przerobic na czytaj z klawiatury!
             is_good = false;
         }
     }
@@ -95,7 +96,7 @@ int read_dir(){
         n = read_sign();
         if (n > 4 || n < 1)
         {
-            Serial.print("bledne dane! Wpisz jeszcze raz\n"); //!przerobic na czytaj z klawiatury!
+            show_message("wpisz ponownie"); //!przerobic na czytaj z klawiatury!
             is_good = false;
         }
     }
@@ -104,32 +105,32 @@ int read_dir(){
 //wczytywanie kroku
 void insert_key_with_dir(int &row, int &col, int &dir){
 
-    Serial.print("wpisz wiersz: ");
+    show_message("wpisz wiersz");
     row = read_col_or_row();
     Serial.print(row);
-    Serial.print("\nwpisz kolumne: ");
+    show_message("pisz kolumne");
     col = read_col_or_row();
     Serial.print(col);;
-    Serial.print("\nwpisz kierunek: ");
+    show_message("wpisz kierunek");
     dir = read_dir();
     Serial.print(dir);
-    Serial.print("\n");
+
 }
 //wczytywanie kroku
 void insert_key(int &row, int &col){
 
-    Serial.print("wpisz wiersz: ");
+    show_message("wpisz wiersz: ");
     row = read_col_or_row();
     Serial.print(row);
-    Serial.print("\nwpisz kolumne: ");
+    show_message("wpisz kolumne: ");
     col = read_col_or_row();
     Serial.print(col);
-    Serial.print("\n");
+    
 }
 
 //TUTAJ WYSYLA SIE TO DO INNEGO ARDU ALE JA WYSWIETLAM W KONSOLI HA-HA  
 void send_location(int row,int col){
-    Serial.write("wyslano: ");
+    Serial.write("wyslano");
     Serial.write(row);
     Serial.write(" ");
     Serial.write(col);
@@ -137,11 +138,11 @@ void send_location(int row,int col){
 }
 
 void receive_location(int &row,int &col){
-    Serial.println("wyslij do gracza :");
-    Serial.println("wpisz wiersz: ");
+    show_message("wyslij do gracza");
+    show_message("wpisz wiersz");
     row = read_col_or_row();
     Serial.print(row);
-    Serial.println("wpisz kolumne: ");
+    show_message("wpisz kolumne");
     col = read_col_or_row();
     Serial.print(col);
     
@@ -149,24 +150,24 @@ void receive_location(int &row,int &col){
 
 //wyslij odpowiedz do drugiego gracza
 void send_answer(int a){
-    if(a==3)Serial.println("wysłano ze zabite : ");
-    else if(a==2)Serial.println("wysłano ze trafiono : ");
+    if(a==3)show_message("twoj zabity!");
+    else if(a==2)show_message("twoj trafiono");
     Serial.print(a);
 }
 
 void receive_answer(int &a){
-    Serial.println("wprowadz odpowiedz");
+    show_message("wprowadz odpowiedz");
     a=read_col_or_row();
 }
 //wyslij 2 do 2 gracza i data[] 
 void send_data(){
-    Serial.println("Wyslano datagram");
+    show_message("Wyslano datagram");
 }
 
 void receive_data(){
-    Serial.println("odebrales datagram");
+    show_message("odebrales datagram");
     for(int i=0;i<4;i++){
-        Serial.println("znak:");
+        show_message("znak:");
         data[i]=read_col_or_row();
     }
 }
@@ -189,11 +190,11 @@ void onKeyPressed(int numBytes)
 {
     char key = Wire.read();
     String keys = (String)key;
-    show_massage(keys);
+    show_message(keys);
     Serial.println(key);
 }
 
-void show_massage(String k)
+void show_message(String k)
 {
 
     disp->lcds[0]->print(k);
@@ -217,11 +218,11 @@ void show_field(int (&f)[10][10])
     {
         for (int j = 0; j < 10; j++)
         {
-            if (f[i][j]!=0)
-            {
+            //if (f[i][j]!=0)
+            //{
                 disp->lcds[k]->setCursor(j + 3, i % 2);
                 disp->lcds[k]->print(disp->cLook[f[i][j]]);
-            }
+            //}
         }
         i % 2 ? k++ : k;
     }
@@ -230,8 +231,8 @@ void show_field(int (&f)[10][10])
 /*----------------------WYswietlanie PAwel---------------------------------------*/
 /*----------------------KOMUNIKACJA-----------------------------------------*/
 
-//wyświetlanie pola gry //przerobic na taka z przekazywana tabela
-// void show_field(int (&f)[10][10]){
+
+// void show1_field(int (&f)[10][10]){
 //     Serial.print("  0 1 2 3 4 5 6 7 8 9 ");
 //     Serial.print("\n");
 //     for (int i = 0; i < 10; i++)
@@ -338,7 +339,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
     switch (dir){
     case 1:
         if (top_count(row, col, size - 1, 11, 11) == (size - 1)){
-            Serial.println("przeszedlem warunek");
+            
             for (i = row; i > row - size; i--)
                 disp->field[i][col] = 1;
             return true;    
@@ -385,16 +386,16 @@ void read_ship(int size){
             if(is_goodpos)is_good_ship=is_good_and_insert(row,col,dir,size);
         }
         else{
-          Serial.println("statek 1os");
+            
             insert_key(row,col);
             is_goodpos = check_pos(row, col, 11, 11);
             if(is_goodpos)is_good_ship=is_good_and_insert(row,col,1,size);
         }
         
 
-        if(is_good_ship) Serial.print("wstawiono\n");
+        if(is_good_ship) show_message("wstawiono");
         else {
-            Serial.print("bledna lokalizacja \n");
+            show_message("bledna lokalizacja");
             is_goodpos=false;
         }
     }
@@ -405,25 +406,25 @@ void read_ship(int size){
 void read_ships(){
     int i;
     
-        Serial.print("Wpisz statki pojedyncze\n");
+        show_message("statki typu 1");
         for(i=0;i<4;i++) {
             read_ship(1);
             show_field(disp->field);
         }
-        Serial.print("Wpisz statki podwojne\n");
+        show_message("statki typu 2");
         for(i=0;i<3;i++) {
             read_ship(2);
             show_field(disp->field);
         }
-        Serial.print("Wpisz statki podtrojne\n");
+        show_message("statki typu 3");
         for(i=0;i<2;i++) {
             read_ship(3);
             show_field(disp->field);
         }
-        Serial.print("Wpisz statek czworke\n");
+        show_message("statki typu 4");
         read_ship(4);
         show_field(disp->field);
-        Serial.print("Koniec wstawiania\n");
+        show_message("Koniec wstawiania");
 }
 
 /*----------------------PROCES GRY----------------------------------------*/
@@ -523,7 +524,7 @@ void sender(){
         again=false;
         while (!is_goodpos)
         {
-            Serial.print("wpisz pole innego gracza\n");
+            show_message("twoja kolej");
             insert_key(row, col); 
             if(disp->field2[row][col]==1) { //jesli pole nieznane (=1)
                 send_location(row,col);
@@ -531,22 +532,25 @@ void sender(){
                 int a;
                 receive_answer(a);
                 if(!a) {
-                    Serial.print("nie trafiles\n");
+                    show_message("nie trafiles");
                     disp->field2[row][col]=0;
                 
                 }  //pusty
                 else if (a==2) { 
-                    Serial.print("Trafiles\n");
+                    show_message("trafiles");
                     disp->field2[row][col]=2; 
                     again=true;
+                    show_field(disp->field2);
                 }
                 else {
-                    Serial.print("zabiles\n");
+                    show_message("zabiles");
                     receive_data();
                     set_killed(disp->field2,0); 
-                    again=true;} //killed odbior macierzy i wypewnienie na killed !napisac fukcje uniw z przekaz argumentow
+                    again=true;
+                    show_field(disp->field2);
+                    } //killed odbior macierzy i wypewnienie na killed !napisac fukcje uniw z przekaz argumentow
             }   
-            else Serial.print("Pole juz bylo wybierane!\n");
+            else show_message("nie powtarzaj sie!");
         }
         show_field(disp->field2);
     }
@@ -557,14 +561,14 @@ void receiver(){
     while(again){
         int row, col;
         again=false;
-        Serial.print("inny gracz wysyla do ciebie \n");
+        show_message("inny gracz");
         receive_location(row,col);
         if(disp->field[row][col]==0) send_answer(0);  //jesli pusty
         else {
             hit(row,col);
             again=true;
         }
-        show_field(disp->field2);
+        show_field(disp->field);
     }
 }
 
@@ -580,7 +584,7 @@ void init_void(){
             disp->field2[i][j]=1;//obce nieznane
         }
     }
-    Serial.println("Wpisz statki");
+    show_message("wpisz statki");
     //read_ships();
 }
 
@@ -592,18 +596,20 @@ bool game_over(){
 void run_game(){
     bool a;
     if(player){ //gdy jestes pierwszy
-            show_field(disp->field2);
+            
             sender();
+            show_field(disp->field2);
             a=game_over();
             if(!a)receiver(); 
             show_field(disp->field);
+            
     }
     else {
             receiver();
-            show_field(disp->field2);
+            show_field(disp->field);
             a=game_over();
             if(!a)sender();
-            show_field(disp->field);
+            show_field(disp->field2);
     }
 }
 void test1(){
@@ -624,7 +630,7 @@ void test1(){
     for(int i=5;i<8;i++)  disp->field[i][7]=1;
     for(int i=1;i<5;i++)  disp->field[i][0]=1;
     show_field(disp->field);
-    Serial.print("\n");
+    
 }
 void setup(){
 
@@ -638,15 +644,16 @@ void setup(){
     Serial.begin(9600);
     
     init_void();
-    test1();
+    //test1();
     bool a=game_over();
+    show_field(disp->field2);
     while(!a){
         run_game();
     }
     if(!lose) 
-        Serial.print("przegrales");
+        show_message("przegrales");
     else
-        Serial.print("wygrales");
+        show_message("wygrales");
     
 }
 
