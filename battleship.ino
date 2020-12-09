@@ -1,19 +1,62 @@
 #define  player 1
+#include <LiquidCrystal.h>
+#include <Wire.h>
+#include <string.h>
 
-int field[10][10];  //moje pole 
-                    //0-pusty 
-                    //1-statek nieznany , w ktory nie trafiono
-                    //2-trafiony
-                    //3-zabity
-int field2[10][10]; //obce pole
-                    //0-znany pusty
-                    //1-pole nieznane
-                    //2-trafiony
-                    //3-zabity
+// int field[10][10];  //moje pole 
+//                     //0-pusty 
+//                     //1-statek nieznany , w ktory nie trafiono
+//                     //2-trafiony
+//                     //3-zabity
+// int field2[10][10]; //obce pole
+//                     //0-znany pusty
+//                     //1-pole nieznane
+//                     //2-trafiony
+//                     //3-zabity
 int lose=20,win=20;
 int data[4];//1- pionowo,col,min_row,max_row
             //0- poziomo,row,min_col,max_col
+class Display
+{
+    LiquidCrystal *lcd1, *lcd2, *lcd3, *lcd4, *lcd5, *lcd6;
 
+public:
+    LiquidCrystal *lcds[6];
+    int field[10][10];
+    int field2[10][10];
+  String cLook[4];
+
+    Display(int e1, int e2, int e3, int e4, int e5, int e6)
+    {
+        cLook[1] = "@";
+        cLook[2] = "/";  
+        cLook[3] = "X";
+      
+      
+        lcd1 = new LiquidCrystal(12, e1, 5, 4, 3, 2);
+        lcd2 = new LiquidCrystal(12, e2, 5, 4, 3, 2);
+        lcd3 = new LiquidCrystal(12, e3, 5, 4, 3, 2);
+        lcd4 = new LiquidCrystal(12, e4, 5, 4, 3, 2);
+        lcd5 = new LiquidCrystal(12, e5, 5, 4, 3, 2);
+        lcd6 = new LiquidCrystal(12, e6, 5, 4, 3, 2);
+        lcds[0] = lcd1;
+        lcds[1] = lcd2;
+        lcds[2] = lcd3;
+        lcds[3] = lcd4;
+        lcds[4] = lcd5;
+        lcds[5] = lcd6;
+
+        lcd1->begin(16, 2);
+        lcd2->begin(16, 2);
+        lcd3->begin(16, 2);
+        lcd4->begin(16, 2);
+        lcd5->begin(16, 2);
+        lcd6->begin(16, 2);
+    };
+
+};
+    Display *disp;
+    int key = 0;
 /*----------------------KOMUNIKACJA-----------------------------------------*/
 //wczytywanie 1 liczbe
 int read_sign(){
@@ -141,23 +184,68 @@ void print_data(){
     }
 }
 /*----------------------KOMUNIKACJA-----------------------------------------*/
+/*----------------------WYswietlanie PAwel---------------------------------------*/
+void onKeyPressed(int numBytes)
+{
+    char key = Wire.read();
+    String keys = (String)key;
+    show_massage(keys);
+    Serial.println(key);
+}
 
-//wyświetlanie pola gry //przerobic na taka z przekazywana tabela
-void show_field(int (&f)[10][10]){
-    Serial.print("  0 1 2 3 4 5 6 7 8 9 ");
-    Serial.print("\n");
+void show_massage(String k)
+{
+
+    disp->lcds[0]->print(k);
+    disp->lcds[0]->setCursor(0, 0);
+}
+
+void show_field(int (&f)[10][10])
+{
+
+    char c;
+    int j = 1;
     for (int i = 0; i < 10; i++)
     {
-        Serial.print(i);
-        Serial.print(" ");
+        c = i + '0';
+        disp->lcds[j]->setCursor(0, i % 2);
+        disp->lcds[j]->print(c);
+        i % 2 ? j++ : j;
+    }
+    int k = 1;
+    for (int i = 0; i < 10; i++)
+    {
         for (int j = 0; j < 10; j++)
         {
-            Serial.print(f[i][j]);
-            Serial.print(" ");
+            if (f[i][j]!=0)
+            {
+                disp->lcds[k]->setCursor(j + 3, i % 2);
+                disp->lcds[k]->print(disp->cLook[f[i][j]]);
+            }
         }
-        Serial.print("\n");
+        i % 2 ? k++ : k;
     }
 }
+
+/*----------------------WYswietlanie PAwel---------------------------------------*/
+/*----------------------KOMUNIKACJA-----------------------------------------*/
+
+//wyświetlanie pola gry //przerobic na taka z przekazywana tabela
+// void show_field(int (&f)[10][10]){
+//     Serial.print("  0 1 2 3 4 5 6 7 8 9 ");
+//     Serial.print("\n");
+//     for (int i = 0; i < 10; i++)
+//     {
+//         Serial.print(i);
+//         Serial.print(" ");
+//         for (int j = 0; j < 10; j++)
+//         {
+//             Serial.print(f[i][j]);
+//             Serial.print(" ");
+//         }
+//         Serial.print("\n");
+//     }
+// }
 
 //czy mozna wstawic pojedynczy klocek
 bool check_pos(int row, int column, int old_row, int old_column){
@@ -183,7 +271,7 @@ bool check_pos(int row, int column, int old_row, int old_column){
             if ((i == old_row) && (j == old_column))
             {
             }
-            else if (field[i][j])
+            else if (disp->field[i][j])
                 return false;
         }
     }
@@ -252,7 +340,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
         if (top_count(row, col, size - 1, 11, 11) == (size - 1)){
             Serial.println("przeszedlem warunek");
             for (i = row; i > row - size; i--)
-                field[i][col] = 1;
+                disp->field[i][col] = 1;
             return true;    
         }   
         break;
@@ -260,7 +348,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
         if (bottom_count(row, col, size - 1, 11, 11) == (size - 1)){
             
             for (i = row; i < row + size; i++)
-                field[i][col] = 1;
+                disp->field[i][col] = 1;
             return true;
         }
         break;
@@ -268,7 +356,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
         if (left_count(row, col, size - 1, 11, 11) == (size - 1)){
             
             for (i = col; i > col - size; i--)
-                field[row][i] = 1;
+                disp->field[row][i] = 1;
             return true;
         }
         break;
@@ -276,7 +364,7 @@ bool is_good_and_insert(int row, int col, int dir, int size)
         if (right_count(row, col, size - 1, 11, 11) == (size - 1)){
             
             for (i = col; i < col + size; i++)
-                field[row][i] = 1;
+                disp->field[row][i] = 1;
             return true;    
         }
         break;
@@ -320,21 +408,21 @@ void read_ships(){
         Serial.print("Wpisz statki pojedyncze\n");
         for(i=0;i<4;i++) {
             read_ship(1);
-            show_field(field);
+            show_field(disp->field);
         }
         Serial.print("Wpisz statki podwojne\n");
         for(i=0;i<3;i++) {
             read_ship(2);
-            show_field(field);
+            show_field(disp->field);
         }
         Serial.print("Wpisz statki podtrojne\n");
         for(i=0;i<2;i++) {
             read_ship(3);
-            show_field(field);
+            show_field(disp->field);
         }
         Serial.print("Wpisz statek czworke\n");
         read_ship(4);
-        show_field(field);
+        show_field(disp->field);
         Serial.print("Koniec wstawiania\n");
 }
 
@@ -344,39 +432,39 @@ bool is_killed(int row,int col){
 
     bool a =check_pos(row,col,row,col);
     int maxim=0,minim=0,i;
-    if((field[row-1][col]==2) || (field[row+1][col]==2)){ 
+    if((disp->field[row-1][col]==2) || (disp->field[row+1][col]==2)){ 
         //jesli w pionie jest trafiony
     
         i=row;
         maxim=i;minim=i;
-        while((field[i][col])){  //poki nie dojdziesz do pustego idz do gory  (poki jest 1 albo 2)
+        while((disp->field[i][col])){  //poki nie dojdziesz do pustego idz do gory  (poki jest 1 albo 2)
             if(i<0) break;
-            if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            if((disp->field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
             minim=i; i--;
         }
         i=row;
-        while((field[i][col])){  //poki nie dojdziesz do pustego idz do dolu (poki jest 1 albo 2)
+        while((disp->field[i][col])){  //poki nie dojdziesz do pustego idz do dolu (poki jest 1 albo 2)
             
             if(i>9) break;
-            if((field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            if((disp->field[i][col])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
             maxim=i;i++;
         }
          insert_in_data(1,col,minim,maxim);
          return true;
     }
-    else if((field[row][col-1]==2) || (field[row][col+1]==2)) {  //jesli w poziomie jest trafiony
+    else if((disp->field[row][col-1]==2) || (disp->field[row][col+1]==2)) {  //jesli w poziomie jest trafiony
         i=col;
         maxim=i;minim=i;
-        while((field[row][i])){  //poki nie dojdziesz do pustego idz zlewa
+        while((disp->field[row][i])){  //poki nie dojdziesz do pustego idz zlewa
             if(i<0) break;
-            if((field[row][i])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            if((disp->field[row][i])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
             minim=i;  i--;                 
         }
         i=col;
-        while((field[row][i])){  //poki nie dojdziesz do pustego idz z prawa
+        while((disp->field[row][i])){  //poki nie dojdziesz do pustego idz z prawa
             
             if(i>9) break;
-            if((field[row][i])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
+            if((disp->field[row][i])==1) return false;     //jesli znajdziesz statek w ktory nie trafiono wyjdz
             maxim=i; i++;
             
         }
@@ -411,14 +499,14 @@ void set_killed(int (&f)[10][10], int my){
 }
 
 void hit(int row,int col){
-    field[row][col]=2; //ustaw jako hit
+    disp->field[row][col]=2; //ustaw jako hit
     bool a = is_killed(row,col);
     if(a){     //jesli zabity to wyslij 3 i maciez data[] i ustaw swoje statki jako zabite
         
-        set_killed(field,1);
+        set_killed(disp->field,1);
         send_answer(3);
         send_data();
-        show_field(field);
+        show_field(disp->field);
 
     }
     else{               //jesli nie wyslij 2 i ustaw aktualny statek na 2
@@ -437,30 +525,30 @@ void sender(){
         {
             Serial.print("wpisz pole innego gracza\n");
             insert_key(row, col); 
-            if(field2[row][col]==1) { //jesli pole nieznane (=1)
+            if(disp->field2[row][col]==1) { //jesli pole nieznane (=1)
                 send_location(row,col);
                 is_goodpos=true;
                 int a;
                 receive_answer(a);
                 if(!a) {
                     Serial.print("nie trafiles\n");
-                    field2[row][col]=0;
+                    disp->field2[row][col]=0;
                 
                 }  //pusty
                 else if (a==2) { 
                     Serial.print("Trafiles\n");
-                    field2[row][col]=2; 
+                    disp->field2[row][col]=2; 
                     again=true;
                 }
                 else {
                     Serial.print("zabiles\n");
                     receive_data();
-                    set_killed(field2,0); 
+                    set_killed(disp->field2,0); 
                     again=true;} //killed odbior macierzy i wypewnienie na killed !napisac fukcje uniw z przekaz argumentow
             }   
             else Serial.print("Pole juz bylo wybierane!\n");
         }
-        show_field(field2);
+        show_field(disp->field2);
     }
 }
 
@@ -471,12 +559,12 @@ void receiver(){
         again=false;
         Serial.print("inny gracz wysyla do ciebie \n");
         receive_location(row,col);
-        if(field[row][col]==0) send_answer(0);  //jesli pusty
+        if(disp->field[row][col]==0) send_answer(0);  //jesli pusty
         else {
             hit(row,col);
             again=true;
         }
-        show_field(field2);
+        show_field(disp->field2);
     }
 }
 
@@ -488,8 +576,8 @@ void init_void(){
     for (i = 0; i < 10; i++)
     {
         for (j = 0; j < 10; j++){
-            field[i][j] =0; //moje puste
-            field2[i][j]=1;//obce nieznane
+            disp->field[i][j] =0; //moje puste
+            disp->field2[i][j]=1;//obce nieznane
         }
     }
     Serial.println("Wpisz statki");
@@ -504,41 +592,49 @@ bool game_over(){
 void run_game(){
     bool a;
     if(player){ //gdy jestes pierwszy
-            show_field(field2);
+            show_field(disp->field2);
             sender();
             a=game_over();
             if(!a)receiver(); 
-            show_field(field);
+            show_field(disp->field);
     }
     else {
             receiver();
-            show_field(field2);
+            show_field(disp->field2);
             a=game_over();
             if(!a)sender();
-            show_field(field);
+            show_field(disp->field);
     }
 }
 void test1(){
     //jednoos
-    field[0][3]=1;
-    field[0][7]=1;
-    field[9][5]=1;
-    field[9][9]=1;
+    disp->field[0][3]=1;
+    disp->field[0][7]=1;
+    disp->field[9][5]=1;
+    disp->field[9][9]=1;
     //dwuos
-    field[2][5]=1;
-    field[3][5]=1;
-    field[2][9]=1;
-    field[3][9]=1;
-    field[4][2]=1;
-    field[4][3]=1;
+    disp->field[2][5]=1;
+    disp->field[3][5]=1;
+    disp->field[2][9]=1;
+    disp->field[3][9]=1;
+    disp->field[4][2]=1;
+    disp->field[4][3]=1;
     //trzyos
-    for(int i=7;i<10;i++)  field[i][2]=1;
-    for(int i=5;i<8;i++)  field[i][7]=1;
-    for(int i=1;i<5;i++)  field[i][0]=1;
-    show_field(field);
+    for(int i=7;i<10;i++)  disp->field[i][2]=1;
+    for(int i=5;i<8;i++)  disp->field[i][7]=1;
+    for(int i=1;i<5;i++)  disp->field[i][0]=1;
+    show_field(disp->field);
     Serial.print("\n");
 }
 void setup(){
+
+    disp = new Display(6, 7, 8, 9, 10, 11);
+    disp->lcds[0]->setCursor(0, 1);
+    disp->lcds[0]->print("   0123456789");
+    disp->lcds[0]->setCursor(0, 0);
+    Wire.begin(9);
+    Wire.onReceive(onKeyPressed);
+
     Serial.begin(9600);
     
     init_void();
@@ -551,7 +647,7 @@ void setup(){
         Serial.print("przegrales");
     else
         Serial.print("wygrales");
-
+    
 }
 
 void loop(){
