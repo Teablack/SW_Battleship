@@ -64,7 +64,6 @@ void waitSerial(){
   while(!Serial.available()){};
 };
 
-//wysyla odpowiedz do innego gracza
 void send_answer(int val){
   Serial.write(val / 256);
   Serial.write(val % 256);
@@ -85,8 +84,8 @@ void send_location(int row, int col){
 }
 
 void receive_location(int *row, int *col){
-  *row = receive_answer();
-  *col = receive_answer();
+  receive_answer(row);
+  receive_answer(col);
 }
 
 void send_data(){
@@ -94,7 +93,7 @@ void send_data(){
 }
 
 void receive_data(){
-  for(int i=0; i < 4; ++i) data[i] = receive_answer();
+  for(int i=0; i < 4; ++i) receive_answer(&data[i]);
 }
 
 
@@ -502,7 +501,7 @@ void receiver(){
         int row, col;
         again=false;
         show_message("inny gracz");
-        receive_location(&row,&col);
+        receive_location(row,col);
         if(disp->field[row][col]==0) send_answer(0);  //jesli pusty
         else {
             hit(row,col);
