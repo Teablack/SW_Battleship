@@ -61,31 +61,45 @@ public:
 /*----------------------KOMUNIKACJA-----------------------------------------*/
 
 void waitSerial(){
-  while(!Serial.available()){};
+  while(Serial.available()){};
 };
 
 void send_answer(int val){
   Serial.write(val / 256);
   Serial.write(val % 256);
+  show_message("wyslalem");
 }
 
 void receive_answer(int *a){
-  byte b1, b2;
-  waitSerial();
-  b1 = Serial.read();
-  waitSerial();
-  b2 = Serial.read();
-  *a = b2  + b1 * 256;
+    show_message("otrzymuje odpo");
+    byte b1, b2;
+    show_message("start wait serial");
+    waitSerial();
+    show_message("end wait serial");
+    b1 = Serial.read();
+    show_message("1 bit");
+    waitSerial();
+    b2 = Serial.read();
+    show_message("2 bit");
+    *a = b2  + b1 * 256;
+    show_message("dostalem odpo");
 }
 
 void send_location(int row, int col){
-  send_answer(row);
-  send_answer(col);
+    
+    send_answer(row);
+    show_message("wyslano wiersz");
+    send_answer(col);
+    show_message("wyslano kolumne");
+    show_message("wyslano");
 }
 
 void receive_location(int *row, int *col){
+  show_message("odbieram");  
   receive_answer(row);
+  show_message("odebr wierz");
   receive_answer(col);
+  show_message("odebr kol");
 }
 
 void send_data(){
@@ -98,12 +112,14 @@ void receive_data(){
 
 
 int gotKey;
-
+char sgotKey;
 bool wantKey = false;
 
 void onKeyPressed(int numBytes){
   if(!wantKey) return;
-  gotKey = Wire.read() - '0';
+  sgotKey=Wire.read();
+  show_message((String)sgotKey);
+  gotKey = sgotKey - '0';
   wantKey = false;
 }
 
@@ -124,13 +140,18 @@ int getDir(){
 }
 
 void insert_key(int *a, int *b){
+    show_message("wpisz wiersz");
     *a = getKey();
+    show_message("wpisz kolumne");
     *b = getKey();
 }
 
 void insert_key_with_dir(int *a, int *b, int *dir){
+    show_message("wpisz wiersz");
     *a = getKey();
+    show_message("wpisz kolumne");
     *b = getKey();
+    show_message("wpisz kierunek");
     *dir = getDir();
 }
 
@@ -504,6 +525,7 @@ void receiver(){
         again=false;
         show_message("inny gracz");
         receive_location(&row,&col);
+        show_message("dostalew wszycho");
         if(disp->field[row][col]==0) send_answer(0);  //jesli pusty
         else {
             hit(row,col);
@@ -526,7 +548,7 @@ void init_void(){
         }
     }
     show_message("wpisz statki");
-    //read_ships();
+    read_ships();
 }
 
 bool game_over(){
