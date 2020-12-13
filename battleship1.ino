@@ -314,13 +314,13 @@ void read_ship(int size){
     while (!is_goodpos)
     {
         if(size!=1){
-            insert_key_with_dir(row,col,dir);
+            insert_key_with_dir(&row,&col,&dir);
             is_goodpos = check_pos(row, col, 11, 11);
             if(is_goodpos)is_good_ship=is_good_and_insert(row,col,dir,size);
         }
         else{
             
-            insert_key(row,col);
+            insert_key(&row,&col);
             is_goodpos = check_pos(row, col, 11, 11);
             if(is_goodpos)is_good_ship=is_good_and_insert(row,col,1,size);
         }
@@ -464,12 +464,12 @@ void sender(){
         while (!is_goodpos)
         {
             show_message("twoja kolej");
-            insert_key(row, col); 
+            insert_key(&row, &col); 
             if(disp->field2[row][col]==1) { //jesli pole nieznane (=1)
                 send_location(row,col);
                 is_goodpos=true;
                 int a;
-                receive_answer(a);
+                receive_answer(&a);
                 if(!a) {
                     show_message("nie trafiles");
                     disp->field2[row][col]=0;
@@ -501,7 +501,7 @@ void receiver(){
         int row, col;
         again=false;
         show_message("inny gracz");
-        receive_location(row,col);
+        receive_location(&row,&col);
         if(disp->field[row][col]==0) send_answer(0);  //jesli pusty
         else {
             hit(row,col);
