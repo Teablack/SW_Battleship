@@ -61,45 +61,45 @@ public:
 /*----------------------KOMUNIKACJA-----------------------------------------*/
 
 void waitSerial(){
-  while(Serial.available()){};
+  while(!Serial.available()){};
 };
 
 void send_answer(int val){
   Serial.write(val / 256);
   Serial.write(val % 256);
-  show_message("wyslalem");
+  //show_message("wyslalem");
 }
 
 void receive_answer(int *a){
-    show_message("otrzymuje odpo");
+    //show_message("otrzymuje odpo");
     byte b1, b2;
-    show_message("start wait serial");
+    //show_message("start wait serial");
     waitSerial();
-    show_message("end wait serial");
+    //show_message("end wait serial");
     b1 = Serial.read();
-    show_message("1 bit");
+    //show_message("1 bit");
     waitSerial();
     b2 = Serial.read();
-    show_message("2 bit");
+    //show_message("2 bit");
     *a = b2  + b1 * 256;
-    show_message("dostalem odpo");
+    //show_message("dostalem odpo");
 }
 
 void send_location(int row, int col){
     
     send_answer(row);
-    show_message("wyslano wiersz");
+    //show_message("wyslano wiersz");
     send_answer(col);
-    show_message("wyslano kolumne");
-    show_message("wyslano");
+    //show_message("wyslano kolumne");
+    //show_message("wyslano");
 }
 
 void receive_location(int *row, int *col){
-  show_message("odbieram");  
+  //show_message("odbieram");  
   receive_answer(row);
-  show_message("odebr wierz");
+  //show_message("odebr wierz");
   receive_answer(col);
-  show_message("odebr kol");
+  //show_message("odebr kol");
 }
 
 void send_data(){
