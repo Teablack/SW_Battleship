@@ -147,6 +147,8 @@ void insert_key_with_dir(int *a, int *b, int *dir){
 void show_message(String k)
 {
 
+    disp->lcds[0]->print("                   ");
+    disp->lcds[0]->setCursor(0, 0);
     disp->lcds[0]->print(k);
     disp->lcds[0]->setCursor(0, 0);
 }
