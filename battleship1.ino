@@ -59,137 +59,12 @@ public:
     Display *disp;
     int key = 0;
 /*----------------------KOMUNIKACJA-----------------------------------------*/
-//wczytywanie 1 liczbe
-int read_sign(){
-    int sign = Serial.parseInt();
-    return sign;
-}
-//wczytywanie columne albo wiersz
-int read_col_or_row(){
-    bool is_good = false;
-    int n;
-    while (!is_good)
-    {
-        is_good = true;
-        while (!(Serial.available() > 0))
-        {
-        }
-        n = read_sign();
-        if (n > 9 || n < 0)
-        {
-            show_message("wpisz ponownie"); //!przerobic na czytaj z klawiatury!
-            is_good = false;
-        }
-    }
-    return n;
-}
 
-int read_dir(){
-    bool is_good = false;
-    int n;
-    while (!is_good)
-    {
-        is_good = true;
-        while (!(Serial.available() > 0))
-        {
-        }
-        n = read_sign();
-        if (n > 4 || n < 1)
-        {
-            show_message("wpisz ponownie"); //!przerobic na czytaj z klawiatury!
-            is_good = false;
-        }
-    }
-    return n;
-}
-//wczytywanie kroku
-void insert_key_with_dir(int &row, int &col, int &dir){
-
-    show_message("wpisz wiersz");
-    row = read_col_or_row();
-    Serial.print(row);
-    show_message("pisz kolumne");
-    col = read_col_or_row();
-    Serial.print(col);;
-    show_message("wpisz kierunek");
-    dir = read_dir();
-    Serial.print(dir);
-
-}
-//wczytywanie kroku
-void insert_key(int &row, int &col){
-
-    show_message("wpisz wiersz: ");
-    row = read_col_or_row();
-    Serial.print(row);
-    show_message("wpisz kolumne: ");
-    col = read_col_or_row();
-    Serial.print(col);
-    
-}
-
-//TUTAJ WYSYLA SIE TO DO INNEGO ARDU ALE JA WYSWIETLAM W KONSOLI HA-HA  
-void send_location(int row,int col){
-    Serial.write("wyslano");
-    Serial.write(row);
-    Serial.write(" ");
-    Serial.write(col);
-    Serial.write("\n");
-}
-
-void receive_location(int &row,int &col){
-    show_message("wyslij do gracza");
-    show_message("wpisz wiersz");
-    row = read_col_or_row();
-    Serial.print(row);
-    show_message("wpisz kolumne");
-    col = read_col_or_row();
-    Serial.print(col);
-    
-}
-
-//wyslij odpowiedz do drugiego gracza
-void send_answer(int a){
-    if(a==3)show_message("twoj zabity!");
-    else if(a==2)show_message("twoj trafiono");
-    Serial.print(a);
-}
-
-void receive_answer(int &a){
-    show_message("wprowadz odpowiedz");
-    a=read_col_or_row();
-}
-//wyslij 2 do 2 gracza i data[] 
-void send_data(){
-    show_message("Wyslano datagram");
-}
-
-void receive_data(){
-    show_message("odebrales datagram");
-    for(int i=0;i<4;i++){
-        show_message("znak:");
-        data[i]=read_col_or_row();
-    }
-}
-
-void insert_in_data(int dir,int k,int k1,int k2){
-    data[0]=dir;
-    data[1]=k;
-    data[2]=k1;
-    data[3]=k2;
-}
-//dla testow
-void print_data(){
-    for(int i =0;i<4;i++){
-        Serial.print(data[i]);
-    }
-}
-/*----------------------KOMUNIKACJA-----------------------------------------*/
-//communication
 void waitSerial(){
   while(!Serial.available()){};
 };
 
+//wysyla odpowiedz do innego gracza
 void send_answer(int val){
   Serial.write(val / 256);
   Serial.write(val % 256);
@@ -205,25 +80,28 @@ void receive_answer(int *a){
 }
 
 void send_location(int row, int col){
-  send_int(row);
-  send_int(col);
+  send_answer(row);
+  send_answer(col);
 }
 
 void receive_location(int *row, int *col){
-  *row = read_int();
-  *col = read_int();
+  *row = receive_answer();
+  *col = receive_answer();
 }
 
 void send_data(){
-  for(int i=0; i < 4; ++i) send_int(data[i]);
+  for(int i=0; i < 4; ++i) send_answer(data[i]);
 }
 
 void receive_data(){
-  for(int i=0; i < 4; ++i) data[i] = read_int();
+  for(int i=0; i < 4; ++i) data[i] = receive_answer();
 }
 
+
 int gotKey;
+
 bool wantKey = false;
+
 void onKeyPressed(int numBytes){
   if(!wantKey) return;
   gotKey = Wire.read() - '0';
@@ -238,11 +116,35 @@ int getKey(){
   return gotKey;
 }
 
+int getDir(){
+  do {
+    wantKey = true;
+    while(wantKey){};
+  } while(gotKey < 1 || gotKey > 4);
+  return gotKey;
+}
+
 void insert_key(int *a, int *b){
     *a = getKey();
     *b = getKey();
 }
+
+void insert_key_with_dir(int *a, int *b, int *dir){
+    *a = getKey();
+    *b = getKey();
+    *dir = getDir();
+}
+
+/*----------------------KOMUNIKACJA-----------------------------------------*/
 /*----------------------WYswietlanie PAwel---------------------------------------*/
+// void onKeyPressed(int numBytes)
+// {
+//     char key = Wire.read();
+//     String keys = (String)key;
+//     show_message(keys);
+//     Serial.println(key);
+// }
+
 void show_message(String k)
 {
 
@@ -279,23 +181,6 @@ void show_field(int (&f)[10][10])
 
 /*----------------------WYswietlanie PAwel---------------------------------------*/
 /*----------------------KOMUNIKACJA-----------------------------------------*/
-
-
-// void show1_field(int (&f)[10][10]){
-//     Serial.print("  0 1 2 3 4 5 6 7 8 9 ");
-//     Serial.print("\n");
-//     for (int i = 0; i < 10; i++)
-//     {
-//         Serial.print(i);
-//         Serial.print(" ");
-//         for (int j = 0; j < 10; j++)
-//         {
-//             Serial.print(f[i][j]);
-//             Serial.print(" ");
-//         }
-//         Serial.print("\n");
-//     }
-// }
 
 //czy mozna wstawic pojedynczy klocek
 bool check_pos(int row, int column, int old_row, int old_column){
@@ -477,6 +362,12 @@ void read_ships(){
 }
 
 /*----------------------PROCES GRY----------------------------------------*/
+void insert_in_data(int dir,int k,int k1,int k2){
+    data[0]=dir;
+    data[1]=k;
+    data[2]=k1;
+    data[3]=k2;
+}
 
 bool is_killed(int row,int col){
 
@@ -611,7 +502,7 @@ void receiver(){
         int row, col;
         again=false;
         show_message("inny gracz");
-        receive_location(row,col);
+        receive_location(&row,&col);
         if(disp->field[row][col]==0) send_answer(0);  //jesli pusty
         else {
             hit(row,col);
@@ -681,7 +572,6 @@ void test1(){
     show_field(disp->field);
     
 }
-
 void setup(){
 
     disp = new Display(6, 7, 8, 9, 10, 11);
