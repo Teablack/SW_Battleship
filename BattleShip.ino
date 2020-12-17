@@ -521,7 +521,7 @@ void init_void(){
         }
     }
     show_message("wpisz statki");
-    read_ships();
+    //read_ships();
 }
 
 bool game_over(){
@@ -540,11 +540,11 @@ void run_game(){
         a = game_over();
         if (!a)
             receiver();
-        show_field(disp->field);
+        show_field(disp->field2);
     }
     else{
         receiver();
-        show_field(disp->field);
+        show_field(disp->field2);
         a = game_over();
         if (!a)
             sender();
@@ -585,7 +585,7 @@ void setup(){
     Serial.begin(9600);
 
     init_void();
-    //test1();
+    test1();
     bool a = game_over();
     show_field(disp->field2);
     while (!a){
