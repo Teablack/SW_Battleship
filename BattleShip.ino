@@ -474,6 +474,7 @@ void sender(){
                 else if (a == 2){
                     show_message("trafiles");
                     disp->field2[row][col] = 2;
+                    if ((lose != 0) && (win != 0))
                     again = true;
                     show_field(disp->field2);
                 }
@@ -481,6 +482,7 @@ void sender(){
                     show_message("zabiles");
                     receive_data();
                     set_killed(disp->field2, 0);
+                    if ((lose != 0) && (win != 0))
                     again = true;
                     show_field(disp->field2);
                 } //killed odbior macierzy i wypewnienie na killed !napisac fukcje uniw z przekaz argumentow
@@ -503,6 +505,7 @@ void receiver(){
             send_answer(0); //jesli pusty
         else{
             hit(row, col);
+            if ((lose != 0) && (win != 0))
             again = true;
         }
         show_field(disp->field);
@@ -590,8 +593,9 @@ void setup(){
     show_field(disp->field2);
     while (!a){
         run_game();
+        a = game_over();
     }
-    if (!lose)
+    if (lose==0)
         show_message("przegrales");
     else
         show_message("wygrales");
